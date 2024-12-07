@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">RateTrackerApp</string>
+
+    <string name="currencies">Currencies</string>
+    <string name="filters">Filters</string>
+    <string name="favorites">Favorites</string>
+    <string name="apply">Apply</string>
+    <string name="sort_by">Sort by</string>
+    <string name="sort_a_z">Code A-Z</string>
+    <string name="sort_z_a">Code Z-A</string>
+    <string name="sort_asc">Quote Asc.</string>
+    <string name="sort_desc">Quote Desc.</string>
+</resources>
