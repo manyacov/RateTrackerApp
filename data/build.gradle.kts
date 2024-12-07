@@ -18,6 +18,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
+        buildConfigField("String", "RATE_TRACKER_API_KEY", "\"6VptZxoNJFzJbLA7wnFozg4UyZgExu53\"")
         buildConfigField("String", "RATE_TRACKER_API_BASE_URL", "\"https://api.apilayer.com/exchangerates_data/\"")
     }
 

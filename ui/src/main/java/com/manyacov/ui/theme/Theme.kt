@@ -1,4 +1,4 @@
-package com.manyacov.ratetrackerapp.ui.theme
+package com.manyacov.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -15,17 +15,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.manyacov.ui.theme.OnPrimary
-import com.manyacov.ui.theme.Outline
-import com.manyacov.ui.theme.Primary
-import com.manyacov.ui.theme.Secondary
-import com.manyacov.ui.theme.Typography
 
 private val DarkColorScheme = darkColorScheme(
     primary = Primary,
     onPrimary = OnPrimary,
     secondary = Secondary,
-    background = Color.White,
+    background = DefaultBg,
     outline = Outline
 )
 
@@ -33,7 +28,7 @@ private val LightColorScheme = lightColorScheme(
     primary = Primary,
     onPrimary = OnPrimary,
     secondary = Secondary,
-    background = Color.White,
+    background = DefaultBg,
     outline = Outline
 
     /* Other default colors to override

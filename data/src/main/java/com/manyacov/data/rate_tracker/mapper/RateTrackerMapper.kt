@@ -30,7 +30,7 @@ fun SymbolsEntity.toDomainModel(): CurrencySymbols {
 fun RatesDto.toDomainModels(): List<CurrencyRateValue> {
     return this.rates.map {
         CurrencyRateValue(
-            symbol = it.key,
+            symbols = it.key,
             value = it.value
         )
     }
