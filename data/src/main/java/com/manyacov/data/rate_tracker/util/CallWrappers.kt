@@ -1,4 +1,4 @@
-package com.manyacov.data.rate_tracker.wrapper
+package com.manyacov.data.rate_tracker.util
 
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import com.manyacov.domain.rate_tracker.utils.NetworkIssues

@@ -1,10 +1,9 @@
-package com.manyacov.presentation.all_rates
+package com.manyacov.presentation.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,42 +19,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
-import com.manyacov.presentation.ui_parts.CurrencyPriceItem
-import com.manyacov.presentation.ui_parts.FilterItem
-import com.manyacov.presentation.ui_parts.SymbolsDropdownMenu
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
+import com.manyacov.presentation.ui_parts.FavoritesPriceItem
 import com.manyacov.ui.theme.Outline
 
 @Composable
-fun AllRatesScreen(
+fun FavoritesScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
-    viewModel: AllRatesViewModel
+    viewModel: FavoritesViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    AllRatesScreen(
+    FavoritesScreen(
         state = state,
         modifier = modifier,
-        navController = navController,
-        selectFavorite = {  symbols ->
-            viewModel.selectFavorite(symbols)
-        }
+        navController = navController
     )
 }
 
 @Composable
-fun AllRatesScreen(
-    state: RateTrackerState,
+fun FavoritesScreen(
+    state: FavoritesTrackerState,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
-    selectFavorite: (String) -> Unit = {}
 ) {
+
     Column(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -67,38 +61,23 @@ fun AllRatesScreen(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
-                text = stringResource(id = R.string.currencies)
+                text = stringResource(id = R.string.favorites)
             )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SymbolsDropdownMenu(
-                    modifier = modifier.weight(1f),
-                    itemsList = state.symbols
-                )
-                FilterItem(
-                    onClick = { navController?.navigate("Filters") }
-                )
-            }
         }
 
-        Spacer(modifier = Modifier
-            .height(1.dp)
-            .fillMaxWidth()
-            .background(color = Outline)
+        Spacer(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(color = Outline)
         )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(state.rates ?: listOf()) { item ->
-                CurrencyPriceItem(
-                    item = item,
-                    onClick = { symbols -> selectFavorite(symbols) }
-                )
+            items(state.listFavorites ?: listOf()) { item ->
+                FavoritesPriceItem(item = item)
             }
         }
     }
@@ -107,22 +86,18 @@ fun AllRatesScreen(
 @Preview
 @Composable
 fun AllRatesScreenPreview() {
-    val item = CurrencyRateValue(
-        symbols = "USD",
-        value = 0.45687,
-        isFavorite = false
+    val item = FavoriteRatesValue(
+        baseSymbols = "USD",
+        symbols = "EUR",
+        value = 0.48554
     )
-    val itemFav = CurrencyRateValue(
-        symbols = "USD",
-        value = 0.45687,
-        isFavorite = true
-    )
-    val ratesList = listOf(item, item, itemFav, itemFav, item)
+
+    val list = listOf(item, item, item)
 
     RateTrackerAppTheme {
-        AllRatesScreen(
-            state = RateTrackerState(
-                rates = ratesList
+        FavoritesScreen(
+            state = FavoritesTrackerState(
+                listFavorites = list
             )
         )
     }

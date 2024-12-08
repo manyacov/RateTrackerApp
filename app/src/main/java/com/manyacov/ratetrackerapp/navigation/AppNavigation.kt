@@ -12,6 +12,8 @@ import com.manyacov.presentation.all_rates.AllRatesScreen
 import com.manyacov.presentation.FilterScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.manyacov.presentation.all_rates.AllRatesViewModel
+import com.manyacov.presentation.favorites.FavoritesScreen
+import com.manyacov.presentation.favorites.FavoritesViewModel
 
 @Composable
 fun AppNavigation(
@@ -42,8 +44,8 @@ fun AppNavigation(
             "Favorites",
             enterTransition = { fadeIn(animationSpec = tween(500)) },
         ) {
-            val viewModel = hiltViewModel<AllRatesViewModel>()
-            AllRatesScreen(
+            val viewModel = hiltViewModel<FavoritesViewModel>()
+            FavoritesScreen(
                 navController = navController,
                 viewModel = viewModel
             )

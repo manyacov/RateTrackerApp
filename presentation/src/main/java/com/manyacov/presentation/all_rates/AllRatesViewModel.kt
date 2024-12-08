@@ -1,16 +1,13 @@
 package com.manyacov.presentation.all_rates
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -24,9 +21,6 @@ class AllRatesViewModel @Inject constructor(
     private val repository: RateTrackerRepository
 ) : ViewModel() {
 
-//    var state by mutableStateOf(RateTrackerState())
-//        private set
-//
     private val _state = MutableStateFlow(RateTrackerState())
     val state = _state
         .onStart {
@@ -38,17 +32,7 @@ class AllRatesViewModel @Inject constructor(
             RateTrackerState(isLoading = true, error = null)
         )
 
-//    fun loadInfo() = viewModelScope.launch {
-//
-//        _state.update {
-//            it.copy(isLoading = true, error = null)
-//        }
-
-        //getCurrencySymbols()
-        //getLatestRates()
-//    }
-
-    private fun getCurrencySymbols() = viewModelScope.launch {
+    private fun getCurrencySymbols() = viewModelScope.launch(Dispatchers.IO) {
         when(val result = repository.getCurrencySymbols()) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", result.data.toString())
@@ -59,6 +43,8 @@ class AllRatesViewModel @Inject constructor(
                         error = null
                     )
                 }
+
+                result.data?.first()?.let { getLatestRates(it.symbols) }
             }
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")
@@ -74,8 +60,8 @@ class AllRatesViewModel @Inject constructor(
         }
     }
 
-    private fun getLatestRates() = viewModelScope.launch {
-        when(val result = repository.getLatestRates("EUR")) {
+    private fun getLatestRates(base: String) = viewModelScope.launch(Dispatchers.IO) {
+        when(val result = repository.getLatestRates(base)) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", result.data.toString())
                 _state.update {
@@ -85,6 +71,29 @@ class AllRatesViewModel @Inject constructor(
                         error = null
                     )
                 }
+            }
+            is CustomResult.Error -> {
+                Log.println(Log.ERROR, "SSSS_n", "")
+
+                _state.update {
+                    it.copy(
+                        rates = null,
+                        isLoading = false,
+                        error = result.message
+                    )
+                }
+            }
+        }
+    }
+
+    fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
+       // repository.changeFavoriteStatus(symbols)
+
+        when(val result = repository.changeFavoriteStatus(symbols)) {
+            is CustomResult.Success -> {
+                Log.println(Log.ERROR, "SSSS", "selectFavorite")
+
+                getLatestRates("AED")
             }
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")

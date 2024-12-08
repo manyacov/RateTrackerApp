@@ -1,7 +1,6 @@
 package com.manyacov.presentation.ui_parts
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,9 +15,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
+import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.ui.theme.RateTrackerAppTheme
-import com.manyacov.ui.theme.Secondary
 import com.manyacov.ui.theme.Yellow
 import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
 import com.manyacov.ui.R
@@ -26,15 +24,13 @@ import com.manyacov.ui.theme.CardBg
 import com.manyacov.ui.theme.roundedCorner12
 
 @Composable
-fun CurrencyPriceItem(
+fun FavoritesPriceItem(
     modifier: Modifier = Modifier,
-    item: CurrencyRateValue,
-    onClick: (String) -> Unit = {}
+    item: FavoriteRatesValue
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick(item.symbols) }
             .padding(
                 vertical = dimensionResource(id = R.dimen.space_size_4),
             ),
@@ -52,7 +48,7 @@ fun CurrencyPriceItem(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = item.symbols,
+                text = "${item.baseSymbols}/${item.symbols}",
                 fontWeight = FontWeight.Normal,
                 fontSize = fontDimensionResource(id = R.dimen.text_size_14)
             )
@@ -65,14 +61,9 @@ fun CurrencyPriceItem(
             )
 
             Icon(
-                painter = if (item.isFavorite) {
-                    painterResource(id = R.drawable.ic_star_on)
-                } else {
-                    painterResource(id = R.drawable.ic_star_off)
-                },
-                tint = if (item.isFavorite) Yellow
-                else Secondary,
-                contentDescription = ""
+                painter = painterResource(id = R.drawable.ic_star_on),
+                tint = Yellow,
+                contentDescription = null
             )
         }
     }
@@ -80,26 +71,13 @@ fun CurrencyPriceItem(
 
 @Preview
 @Composable
-fun CurrencyPriceItemFavoritePreview() {
-    val item = CurrencyRateValue (
+fun FavoritesPriceItemPreview() {
+    val item = FavoriteRatesValue (
+        baseSymbols = "EUR",
         symbols = "USD",
-        value = 0.45687,
-        isFavorite = true
+        value = 0.45687
     )
     RateTrackerAppTheme {
-        CurrencyPriceItem(item = item)
-    }
-}
-
-@Preview
-@Composable
-fun CurrencyPriceItemNotFavoritePreview() {
-    val item = CurrencyRateValue (
-        symbols = "USD",
-        value = 0.45687,
-        isFavorite = false
-    )
-    RateTrackerAppTheme {
-        CurrencyPriceItem(item = item)
+        FavoritesPriceItem(item = item)
     }
 }

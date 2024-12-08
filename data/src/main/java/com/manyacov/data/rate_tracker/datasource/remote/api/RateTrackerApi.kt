@@ -12,4 +12,10 @@ interface RateTrackerApi {
 
     @GET("latest")
     suspend fun getLatestRates(@Query("base") base: String): RatesDto
+
+    @GET("latest")
+    suspend fun getLatestRatesForPair(
+        @Query("base") base: String?,
+        @Query("symbols") symbols: String?,
+    ): RatesDto
 }
