@@ -86,10 +86,10 @@ class AllRatesViewModel @Inject constructor(
         }
     }
 
-    fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun selectFavorite(base: String, symbols: String) = viewModelScope.launch(Dispatchers.IO) {
        // repository.changeFavoriteStatus(symbols)
 
-        when(val result = repository.changeFavoriteStatus(symbols)) {
+        when(val result = repository.changeFavoriteStatus(base, symbols)) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", "selectFavorite")
 

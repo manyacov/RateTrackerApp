@@ -14,5 +14,5 @@ data class FavoritePairEntity(
     @ColumnInfo(name = "symbols")
     val symbols: String?,
     @ColumnInfo(name = "lastUpdate")
-    val lastUpdate: Date
+    val lastUpdate: Date? = null
 )

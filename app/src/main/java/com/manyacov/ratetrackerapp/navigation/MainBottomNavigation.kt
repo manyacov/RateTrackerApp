@@ -1,6 +1,5 @@
 package com.manyacov.ratetrackerapp.navigation
 
-import android.annotation.SuppressLint
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -11,14 +10,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.DefaultBg
 import com.manyacov.ui.theme.Primary
 
-@SuppressLint("RestrictedApi")
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar(
         containerColor = DefaultBg,
@@ -38,8 +36,9 @@ fun BottomNavigationBar(navController: NavController) {
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
+                    navController.navigate(items[index])
                 },
-                alwaysShowLabel = false
+                alwaysShowLabel = true
             )
         }
     }

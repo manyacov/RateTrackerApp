@@ -34,7 +34,7 @@ class FavoritesViewModel @Inject constructor(
         when(val result = repository.getFavoriteRates()) {
             is CustomResult.Success -> {
 
-                Log.println(Log.ERROR, "SSSS_s", "")
+                Log.println(Log.ERROR, "SSSS_s", result.data.toString())
 
                 _state.update {
                     it.copy(

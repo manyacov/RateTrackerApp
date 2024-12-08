@@ -44,7 +44,7 @@ fun AllRatesScreen(
         modifier = modifier,
         navController = navController,
         selectFavorite = {  symbols ->
-            viewModel.selectFavorite(symbols)
+            viewModel.selectFavorite(state.symbols.first().symbols, symbols)
         }
     )
 }

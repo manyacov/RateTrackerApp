@@ -2,11 +2,13 @@ package com.manyacov.data.rate_tracker.repository
 
 import android.util.Log
 import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
+import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
 import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
 import com.manyacov.data.rate_tracker.mapper.toDomainModel
 import com.manyacov.data.rate_tracker.mapper.toEntityModels
 import com.manyacov.data.rate_tracker.mapper.toDomainModels
+import com.manyacov.data.rate_tracker.mapper.toEntityRateModel
 import com.manyacov.data.rate_tracker.util.isLessThanOneMonthAgo
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
 import com.manyacov.data.rate_tracker.util.safeCall
@@ -46,8 +48,14 @@ class RateTrackerRepositoryImpl @Inject constructor(
     override suspend fun getLatestRates(base: String): CustomResult<List<CurrencyRateValue>?> {
         return safeCall {
             val result = rateTrackerApi.getLatestRates(base)
+            val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
 
-            val entities = result.toEntityModels()
+            val entities = result.rates.map { rate ->
+                rate.toEntityRateModel(
+                    isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
+                    date = result.date
+                )
+            }
             localSource.rateTrackerDao.saveRatesList(entities)
 
             val cached = localSource.rateTrackerDao.getRateList()
@@ -72,12 +80,35 @@ class RateTrackerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun changeFavoriteStatus(symbols: String): CustomResult<Unit?> {
+    override suspend fun changeFavoriteStatus(base: String, symbols: String): CustomResult<Unit?> {
         return safeCall {
             val db = localSource.rateTrackerDao
 
             val rateEntity = db.getRateEntityBySymbols(symbols)
+            if (rateEntity.isFavorite) {
+                removeFavoritePair(base, symbols)
+            } else {
+                saveFavoritePair(base, symbols)
+            }
             db.updateRateEntity(symbols, !rateEntity.isFavorite)
+        }
+    }
+
+    private suspend fun saveFavoritePair(base: String, symbols: String): CustomResult<Unit?> {
+        return safeCall {
+            val db = localSource.rateTrackerDao
+            val favoriteEntity = FavoritePairEntity(
+                baseSymbols = base,
+                symbols = symbols,
+            )
+            db.saveFavoriteRatesEntity(favoriteEntity)
+        }
+    }
+
+    private suspend fun removeFavoritePair(base: String, symbols: String): CustomResult<Unit?> {
+        return safeCall {
+            val db = localSource.rateTrackerDao
+            db.removeFavoriteRatesEntity(base, symbols)
         }
     }
 }

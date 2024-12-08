@@ -11,15 +11,17 @@ import androidx.navigation.compose.rememberNavController
 import com.manyacov.presentation.all_rates.AllRatesScreen
 import com.manyacov.presentation.FilterScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.manyacov.presentation.all_rates.AllRatesViewModel
 import com.manyacov.presentation.favorites.FavoritesScreen
 import com.manyacov.presentation.favorites.FavoritesViewModel
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
-    val navController = rememberNavController()
 
     BackHandler(enabled = navController.currentBackStackEntry != null) {
         navController.navigateUp()

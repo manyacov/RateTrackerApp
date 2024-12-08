@@ -13,5 +13,5 @@ interface RateTrackerRepository {
 
     suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?>
 
-    suspend fun changeFavoriteStatus(symbols: String): CustomResult<Unit?>
+    suspend fun changeFavoriteStatus(base: String, symbols: String): CustomResult<Unit?>
 }

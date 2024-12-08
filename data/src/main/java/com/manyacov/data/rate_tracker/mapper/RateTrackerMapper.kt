@@ -15,6 +15,7 @@ fun getCurrentUtcDate(): Date {
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     return calendar.time
 }
+
 fun SymbolsDto.toEntityModels(): List<SymbolsEntity> {
     return this.symbols.map {
         SymbolsEntity(
@@ -23,21 +24,31 @@ fun SymbolsDto.toEntityModels(): List<SymbolsEntity> {
         )
     }
 }
+
 fun SymbolsEntity.toDomainModel(): CurrencySymbols {
     return CurrencySymbols(
         symbols = this.symbols
     )
 }
 
-fun RatesDto.toEntityModels(): List<RateEntity> {
-    return this.rates.map {
-        RateEntity(
-            symbols = it.key,
-            value = it.value,
-            date = this.date,
-            isFavorite = false
-        )
-    }
+//fun RatesDto.toEntityModels(): List<RateEntity> {
+//    return this.rates.map {
+//        RateEntity(
+//            symbols = it.key,
+//            value = it.value,
+//            date = this.date,
+//            isFavorite = false
+//        )
+//    }
+//}
+
+fun  Map.Entry<String, Double>.toEntityRateModel(isFavorite: Boolean, date: String): RateEntity {
+    return RateEntity(
+        symbols = this.key,
+        value = this.value,
+        date = date,
+        isFavorite = isFavorite
+    )
 }
 
 fun RateEntity.toDomainModels(): CurrencyRateValue {

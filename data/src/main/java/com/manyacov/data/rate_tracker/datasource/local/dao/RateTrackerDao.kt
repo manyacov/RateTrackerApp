@@ -28,8 +28,14 @@ interface RateTrackerDao {
     suspend fun updateRateEntity(symbols: String, isFavorite: Boolean)
 
     @Insert
-    suspend fun saveFavoriteRatesList(list: List<FavoritePairEntity>)
+    suspend fun saveFavoriteRatesEntity(favoriteEntity: FavoritePairEntity)
+
+    @Query("DELETE FROM favorites WHERE base_symbols = :base AND symbols = :symbols")
+    suspend fun removeFavoriteRatesEntity(base: String, symbols: String)
 
     @Query("SELECT * FROM favorites")
     suspend fun getFavoriteRatesList(): List<FavoritePairEntity>
+
+    @Query("SELECT * FROM favorites WHERE base_symbols = :base")
+    suspend fun getFavoriteRatesListByBase(base: String): List<FavoritePairEntity>
 }
