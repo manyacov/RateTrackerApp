@@ -7,11 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.manyacov.presentation.all_rates.AllRatesScreen
-import com.manyacov.presentation.FilterScreen
+import com.manyacov.presentation.filter.FilterScreen
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.manyacov.presentation.all_rates.AllRatesViewModel
 import com.manyacov.presentation.favorites.FavoritesScreen
@@ -29,16 +27,20 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = "Currencies",
+        startDestination = "Currencies/{filter_type}",
         modifier = modifier
     ) {
         composable(
-            "Currencies",
+            "Currencies/{filter_type}",
             enterTransition = { fadeIn(animationSpec = tween(500)) },
-        ) {
+        ) { backStackEntry ->
             val viewModel = hiltViewModel<AllRatesViewModel>()
+
+            val filterType = backStackEntry.arguments?.getString("filter_type")
+
             AllRatesScreen(
                 navController = navController,
+                filterType = filterType,
                 viewModel = viewModel
             )
         }

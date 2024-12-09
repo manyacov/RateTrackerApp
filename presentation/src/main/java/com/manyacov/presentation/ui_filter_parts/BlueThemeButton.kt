@@ -40,7 +40,6 @@ fun BlueThemeButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
         ),
-        //enabled = enabled,
         onClick = onClick
     ) {
         Text(

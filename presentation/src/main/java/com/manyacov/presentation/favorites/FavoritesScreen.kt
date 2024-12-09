@@ -39,7 +39,10 @@ fun FavoritesScreen(
     FavoritesScreen(
         state = state,
         modifier = modifier,
-        navController = navController
+        navController = navController,
+        removeFavoritePair = { base, symbols ->
+            viewModel.removeFavoritePair(base, symbols)
+        }
     )
 }
 
@@ -48,6 +51,7 @@ fun FavoritesScreen(
     state: FavoritesTrackerState,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
+    removeFavoritePair: (String, String) -> Unit = { _, _ -> }
 ) {
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -77,7 +81,12 @@ fun FavoritesScreen(
             contentPadding = PaddingValues(16.dp)
         ) {
             items(state.listFavorites ?: listOf()) { item ->
-                FavoritesPriceItem(item = item)
+                FavoritesPriceItem(
+                    item = item,
+                    onClick = { base, symbols ->
+                        removeFavoritePair(base, symbols)
+                    }
+                )
             }
         }
     }

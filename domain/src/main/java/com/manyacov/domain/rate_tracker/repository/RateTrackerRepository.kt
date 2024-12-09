@@ -9,9 +9,11 @@ interface RateTrackerRepository {
 
     suspend fun getCurrencySymbols(): CustomResult<List<CurrencySymbols>?>
 
-    suspend fun getLatestRates(base: String): CustomResult<List<CurrencyRateValue>?>
+    suspend fun getLatestRates(base: String, filterType: String?): CustomResult<List<CurrencyRateValue>?>
 
     suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?>
 
     suspend fun changeFavoriteStatus(base: String, symbols: String): CustomResult<Unit?>
+
+    suspend fun removeFavoritePair(base: String, symbols: String): CustomResult<Unit?>
 }

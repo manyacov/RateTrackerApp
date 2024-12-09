@@ -1,6 +1,7 @@
 package com.manyacov.presentation.ui_parts
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,11 +27,13 @@ import com.manyacov.ui.theme.roundedCorner12
 @Composable
 fun FavoritesPriceItem(
     modifier: Modifier = Modifier,
-    item: FavoriteRatesValue
+    item: FavoriteRatesValue,
+    onClick: (String, String) -> Unit = { _, _ -> }
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick(item.baseSymbols, item.symbols) }
             .padding(
                 vertical = dimensionResource(id = R.dimen.space_size_4),
             ),

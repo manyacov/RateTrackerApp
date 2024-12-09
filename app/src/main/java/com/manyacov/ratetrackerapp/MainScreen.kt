@@ -13,6 +13,8 @@ import com.manyacov.ui.theme.RateTrackerAppTheme
 
 @Composable
 fun MainScreen(navController: NavHostController) {
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->

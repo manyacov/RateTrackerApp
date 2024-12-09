@@ -10,8 +10,8 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.manyacov.ui.theme.Primary
@@ -41,7 +41,7 @@ fun SortOption(
         )
 
         RadioButton(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.space_size_14)),
             selected = isSelected,
             onClick = onClick,
             colors = RadioButtonDefaults.colors(

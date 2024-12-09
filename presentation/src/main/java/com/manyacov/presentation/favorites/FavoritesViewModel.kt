@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -30,8 +31,8 @@ class FavoritesViewModel @Inject constructor(
             FavoritesTrackerState(isLoading = true, error = null)
         )
 
-    private fun getFavoritesList() = viewModelScope.launch {
-        when(val result = repository.getFavoriteRates()) {
+    private fun getFavoritesList() = viewModelScope.launch(Dispatchers.IO) {
+        when (val result = repository.getFavoriteRates()) {
             is CustomResult.Success -> {
 
                 Log.println(Log.ERROR, "SSSS_s", result.data.toString())
@@ -44,6 +45,7 @@ class FavoritesViewModel @Inject constructor(
                     )
                 }
             }
+
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")
 
@@ -54,6 +56,23 @@ class FavoritesViewModel @Inject constructor(
                         error = result.message
                     )
                 }
+            }
+        }
+    }
+
+    fun removeFavoritePair(baseSymbols: String, symbols: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            removeFavorite(baseSymbols, symbols)
+        }
+
+    private suspend fun removeFavorite(baseSymbols: String, symbols: String) {
+        when (val result = repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
+            is CustomResult.Success -> {
+                getFavoritesList()
+            }
+
+            is CustomResult.Error -> {
+                Log.println(Log.ERROR, "SSSS_n", "")
             }
         }
     }

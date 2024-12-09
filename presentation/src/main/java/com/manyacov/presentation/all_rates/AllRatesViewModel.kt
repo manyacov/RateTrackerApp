@@ -24,6 +24,8 @@ class AllRatesViewModel @Inject constructor(
     private val _state = MutableStateFlow(RateTrackerState())
     val state = _state
         .onStart {
+            Log.println(Log.ERROR, "TTTT", "onStart")
+
             getCurrencySymbols()
         }
         .stateIn(
@@ -61,7 +63,35 @@ class AllRatesViewModel @Inject constructor(
     }
 
     private fun getLatestRates(base: String) = viewModelScope.launch(Dispatchers.IO) {
-        when(val result = repository.getLatestRates(base)) {
+        when(val result = repository.getLatestRates(base, null)) {
+            is CustomResult.Success -> {
+                Log.println(Log.ERROR, "SSSS", result.data.toString())
+                _state.update {
+                    it.copy(
+                        rates = result.data,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+            }
+            is CustomResult.Error -> {
+                Log.println(Log.ERROR, "SSSS_n", "")
+
+                _state.update {
+                    it.copy(
+                        rates = null,
+                        isLoading = false,
+                        error = result.message
+                    )
+                }
+            }
+        }
+    }
+
+    fun applyFilter(base: String, filterType: String?) = viewModelScope.launch(Dispatchers.IO) {
+        Log.println(Log.ERROR, "TTTT", "applyFilter")
+
+        when(val result = repository.getLatestRates(base, filterType)) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", result.data.toString())
                 _state.update {
@@ -87,13 +117,11 @@ class AllRatesViewModel @Inject constructor(
     }
 
     fun selectFavorite(base: String, symbols: String) = viewModelScope.launch(Dispatchers.IO) {
-       // repository.changeFavoriteStatus(symbols)
-
         when(val result = repository.changeFavoriteStatus(base, symbols)) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", "selectFavorite")
 
-                getLatestRates("AED")
+                getLatestRates("USD")
             }
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")
