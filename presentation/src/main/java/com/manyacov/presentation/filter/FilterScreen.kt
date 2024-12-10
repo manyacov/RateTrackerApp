@@ -35,7 +35,7 @@ fun FilterScreen(
     filterType: String?,
     navController: NavHostController? = null
 ) {
-    val selectedOption = remember { mutableStateOf("Code A-Z") }
+    val selectedOption = remember { mutableStateOf(filterType.getSortOptionByDescription()) }
 
     Column(
         modifier = modifier
@@ -81,13 +81,14 @@ fun FilterScreen(
         )
 
         SortOptions.entries.forEach {
-            val filter = stringResource(id = it.getDescriptionRes())
+            val title = stringResource(id = it.getDescriptionRes())
+
             SortOption(
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
-                text = filter,
-                isSelected = selectedOption.value == filter,
-                onClick = { selectedOption.value = filter }
+                text = title,
+                isSelected = selectedOption.value == it,
+                onClick = { selectedOption.value = it }
             )
         }
 

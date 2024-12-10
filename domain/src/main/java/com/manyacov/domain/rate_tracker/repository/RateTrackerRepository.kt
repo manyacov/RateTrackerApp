@@ -11,9 +11,6 @@ interface RateTrackerRepository {
 
     suspend fun getCurrencySymbols(): CustomResult<List<CurrencySymbols>?>
 
-    suspend fun getLatestRates(base: String, filterType: String?): CustomResult<List<CurrencyRateValue>?>
-
-    //suspend fun loadLatestRates(base: String, filterType: String?): CustomResult<PagingSource<Int, CurrencyRateValue>?>
     suspend fun loadLatestRates(base: String, filterType: String?): CustomResult<Flow<PagingData<CurrencyRateValue>>?>
 
     suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?>

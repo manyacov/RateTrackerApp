@@ -8,12 +8,12 @@ import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
 import com.manyacov.domain.rate_tracker.utils.CustomResult
+import com.manyacov.presentation.filter.SortOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,11 +26,11 @@ class AllRatesViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(RateTrackerState())
     val state = _state
-        .onStart {
-            Log.println(Log.ERROR, "TTTT", "onStart")
-
-            getCurrencySymbols()
-        }
+//        .onStart {
+//            Log.println(Log.ERROR, "TTTT", "onStart")
+//
+//            getCurrencySymbols()
+//        }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
@@ -43,7 +43,7 @@ class AllRatesViewModel @Inject constructor(
         get() = _rateValues
 
 
-    private fun getCurrencySymbols() = viewModelScope.launch(Dispatchers.IO) {
+    fun getCurrencySymbols() = viewModelScope.launch(Dispatchers.IO) {
         when(val result = repository.getCurrencySymbols()) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", result.data.toString())
@@ -54,8 +54,6 @@ class AllRatesViewModel @Inject constructor(
                         error = null
                     )
                 }
-
-                result.data?.first()?.let { getLatestRates(it.symbols) }
             }
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")
@@ -71,8 +69,8 @@ class AllRatesViewModel @Inject constructor(
         }
     }
 
-    private fun getLatestRates(base: String) = viewModelScope.launch(Dispatchers.IO) {
-        when(val result = repository.loadLatestRates(base, null)) {
+    fun getLatestRates(base: String, sortOption: SortOptions?) = viewModelScope.launch(Dispatchers.IO) {
+        when(val result = repository.loadLatestRates(base, sortOption.toString())) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", result.data.toString())
 //                _state.update {
@@ -98,41 +96,41 @@ class AllRatesViewModel @Inject constructor(
         }
     }
 
-    fun applyFilter(base: String, filterType: String?) = viewModelScope.launch(Dispatchers.IO) {
-        Log.println(Log.ERROR, "TTTT", "applyFilter")
-
-        when(val result = repository.loadLatestRates(base, filterType)) {
-            is CustomResult.Success -> {
-                Log.println(Log.ERROR, "SSSS", result.data.toString())
+//    fun applyFilter(base: String, filterType: String?) = viewModelScope.launch(Dispatchers.IO) {
+//        Log.println(Log.ERROR, "TTTT", "applyFilter")
+//
+//        when(val result = repository.loadLatestRates(base, filterType)) {
+//            is CustomResult.Success -> {
+//                Log.println(Log.ERROR, "SSSS", result.data.toString())
+////                _state.update {
+////                    it.copy(
+////                        rates = result.data,
+////                        isLoading = false,
+////                        error = null
+////                    )
+////                }
+//                _rateValues = result.data
+//            }
+//            is CustomResult.Error -> {
+//                Log.println(Log.ERROR, "SSSS_n", "")
+//
 //                _state.update {
 //                    it.copy(
-//                        rates = result.data,
+//                        rates = null,
 //                        isLoading = false,
-//                        error = null
+//                        error = result.message
 //                    )
 //                }
-                _rateValues = result.data
-            }
-            is CustomResult.Error -> {
-                Log.println(Log.ERROR, "SSSS_n", "")
-
-                _state.update {
-                    it.copy(
-                        rates = null,
-                        isLoading = false,
-                        error = result.message
-                    )
-                }
-            }
-        }
-    }
+//            }
+//        }
+//    }
 
     fun selectFavorite(base: String, symbols: String) = viewModelScope.launch(Dispatchers.IO) {
         when(val result = repository.changeFavoriteStatus(base, symbols)) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", "selectFavorite")
 
-                getLatestRates("USD")
+                getLatestRates("USD", null)
             }
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")

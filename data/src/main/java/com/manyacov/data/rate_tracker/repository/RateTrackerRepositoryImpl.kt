@@ -55,46 +55,6 @@ class RateTrackerRepositoryImpl @Inject constructor(
         return localSource.rateTrackerDao.getCurrencySymbolsList()
     }
 
-    override suspend fun getLatestRates(
-        base: String,
-        filterType: String?
-    ): CustomResult<List<CurrencyRateValue>?> {
-        return safeCall {
-            //val result = rateTrackerApi.getLatestRates(base)
-            val result = mockLatestRates()
-
-            val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
-
-            val entities = result.rates.map { rate ->
-                rate.toEntityRateModel(
-                    isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
-                    date = result.date
-                )
-            }
-            localSource.rateTrackerDao.clearRatesTable()
-            localSource.rateTrackerDao.saveRatesList(entities)
-
-            Log.println(Log.ERROR, "TTTT impl", filterType.toString())
-
-            val cached = when (filterType) {
-                null, "Code A-Z" -> {
-                    localSource.rateTrackerDao.getRateListSortedBySymbolsAsc()
-                }
-                "Code Z-A" -> {
-                    localSource.rateTrackerDao.getRateListSortedBySymbolsDesc()
-                }
-                "Quote Asc." -> {
-                    localSource.rateTrackerDao.getRateListSortedByQuoteAsc()
-                }
-                else -> {
-                    localSource.rateTrackerDao.getRateListSortedByQuoteDesc()
-                }
-            }
-            cached.map { it.toDomainModels() }
-        }
-    }
-
-
     override suspend fun loadLatestRates(
         base: String,
         filterType: String?
@@ -117,37 +77,19 @@ class RateTrackerRepositoryImpl @Inject constructor(
 
             Pager(
                 config = PagingConfig(pageSize = 20),
-                pagingSourceFactory = { localSource.rateTrackerDao.getPagingRateListSortedBySymbolsAsc() }
+                pagingSourceFactory = {
+                    when(filterType) {
+                        "CODE_Z_A" -> localSource.rateTrackerDao.getRateListSortedBySymbolsDesc()
+                        "QUOTE_ASC" -> localSource.rateTrackerDao.getRateListSortedByQuoteAsc()
+                        "QUOTE_DESC" -> localSource.rateTrackerDao.getRateListSortedByQuoteDesc()
+                        else -> localSource.rateTrackerDao.getRateListSortedBySymbolsAsc()
+                    }
+                }
             ).flow.map { pagingData ->
                 pagingData.map { entity ->
                     entity.toDomainModels()
                 }
             }
-
-
-//            Log.println(Log.ERROR, "TTTT impl", filterType.toString())
-//
-//            val c = localSource.rateTrackerDao.getPagingRateListSortedBySymbolsAsc()
-//
-//
-//
-//            val r = c.map
-//
-//            val cached = when (filterType) {
-//                null, "Code A-Z" -> {
-//                    localSource.rateTrackerDao.getRateListSortedBySymbolsAsc()
-//                }
-//                "Code Z-A" -> {
-//                    localSource.rateTrackerDao.getRateListSortedBySymbolsDesc()
-//                }
-//                "Quote Asc." -> {
-//                    localSource.rateTrackerDao.getRateListSortedByQuoteAsc()
-//                }
-//                else -> {
-//                    localSource.rateTrackerDao.getRateListSortedByQuoteDesc()
-//                }
-//            }
-//            cached.map { it.toDomainModels() }
         }
     }
 

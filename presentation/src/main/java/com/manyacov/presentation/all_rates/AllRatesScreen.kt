@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.manyacov.presentation.filter.getSortOptionByDescription
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -45,16 +46,23 @@ fun AllRatesScreen(
     viewModel: AllRatesViewModel,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val ratesLazyPagingItems = viewModel.rateValues?.collectAsLazyPagingItems()
 
-    LaunchedEffect(filterType) {
-        Log.println(Log.ERROR, "TTTT LaunchedEffect", filterType.toString())
-        viewModel.applyFilter("USD", filterType)
+    LaunchedEffect(Unit) {
+        viewModel.getCurrencySymbols()
+        Log.println(Log.ERROR, "TTTT LaunchedEffect getCurrencySymbols", filterType.toString())
+    }
+
+    LaunchedEffect(key1 = filterType) {
+        Log.println(Log.ERROR, "TTTT LaunchedEffect filterType", filterType.toString())
+
+        //viewModel.applyFilter("USD", filterType)
+        viewModel.getLatestRates("USD", filterType.getSortOptionByDescription())
     }
 
     AllRatesScreen(
         state = state,
+        filterType = filterType,
         ratesLazyPagingItems = ratesLazyPagingItems,
         modifier = modifier,
         navController = navController,
@@ -67,6 +75,7 @@ fun AllRatesScreen(
 @Composable
 fun AllRatesScreen(
     state: RateTrackerState,
+    filterType: String?,
     ratesLazyPagingItems: LazyPagingItems<CurrencyRateValue>?,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
@@ -95,7 +104,7 @@ fun AllRatesScreen(
                     itemsList = state.symbols
                 )
                 FilterItem(
-                    onClick = { navController?.navigate("filters/{filter_type}") }
+                    onClick = { navController?.navigate("filters/$filterType") }
                 )
             }
         }
@@ -112,6 +121,8 @@ fun AllRatesScreen(
             contentPadding = PaddingValues(16.dp)
         ) {
             items(count = ratesLazyPagingItems?.itemCount ?: 0) { index ->
+                Log.println(Log.ERROR, "FFFF", "init lazy column")
+                Log.println(Log.ERROR, "FFFF", ratesLazyPagingItems?.itemCount.toString())
                 val item = ratesLazyPagingItems?.get(index)
                 if (item != null) {
                     CurrencyPriceItem(

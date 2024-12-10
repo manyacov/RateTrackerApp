@@ -31,20 +31,20 @@ interface RateTrackerDao {
     @Query("DELETE FROM rate_entity")
     suspend fun clearRatesTable()
 
-    @Query("SELECT * FROM rate_entity ORDER BY symbols ASC")
-    fun getPagingRateListSortedBySymbolsAsc(): PagingSource<Int, RateEntity>
+//    @Query("SELECT * FROM rate_entity ORDER BY symbols ASC")
+//    fun getPagingRateListSortedBySymbolsAsc(): PagingSource<Int, RateEntity>
 
     @Query("SELECT * FROM rate_entity ORDER BY symbols ASC")
-    suspend fun getRateListSortedBySymbolsAsc(): List<RateEntity>
+    fun getRateListSortedBySymbolsAsc(): PagingSource<Int, RateEntity>
 
     @Query("SELECT * FROM rate_entity ORDER BY symbols DESC")
-    suspend fun getRateListSortedBySymbolsDesc(): List<RateEntity>
+    fun getRateListSortedBySymbolsDesc(): PagingSource<Int, RateEntity>
 
     @Query("SELECT * FROM rate_entity ORDER BY value ASC")
-    suspend fun getRateListSortedByQuoteAsc(): List<RateEntity>
+    fun getRateListSortedByQuoteAsc(): PagingSource<Int, RateEntity>
 
     @Query("SELECT * FROM rate_entity ORDER BY value DESC")
-    suspend fun getRateListSortedByQuoteDesc(): List<RateEntity>
+    fun getRateListSortedByQuoteDesc(): PagingSource<Int, RateEntity>
 
     @Query("SELECT * FROM favorites WHERE base_symbols = :base")
     suspend fun getFavoriteRatesListByBase(base: String): List<FavoritePairEntity>
