@@ -1,5 +1,6 @@
 package com.manyacov.presentation.all_rates
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,8 +31,12 @@ import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
+import androidx.paging.compose.collectAsLazyPagingItems
 
+
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AllRatesScreen(
     modifier: Modifier = Modifier,
@@ -42,6 +46,8 @@ fun AllRatesScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val ratesLazyPagingItems = viewModel.rateValues?.collectAsLazyPagingItems()
+
     LaunchedEffect(filterType) {
         Log.println(Log.ERROR, "TTTT LaunchedEffect", filterType.toString())
         viewModel.applyFilter("USD", filterType)
@@ -49,9 +55,10 @@ fun AllRatesScreen(
 
     AllRatesScreen(
         state = state,
+        ratesLazyPagingItems = ratesLazyPagingItems,
         modifier = modifier,
         navController = navController,
-        selectFavorite = {  symbols ->
+        selectFavorite = { symbols ->
             viewModel.selectFavorite(state.symbols.first().symbols, symbols)
         }
     )
@@ -60,6 +67,7 @@ fun AllRatesScreen(
 @Composable
 fun AllRatesScreen(
     state: RateTrackerState,
+    ratesLazyPagingItems: LazyPagingItems<CurrencyRateValue>?,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
     selectFavorite: (String) -> Unit = {}
@@ -92,21 +100,25 @@ fun AllRatesScreen(
             }
         }
 
-        Spacer(modifier = Modifier
-            .height(1.dp)
-            .fillMaxWidth()
-            .background(color = Outline)
+        Spacer(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(color = Outline)
         )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(state.rates ?: listOf()) { item ->
-                CurrencyPriceItem(
-                    item = item,
-                    onClick = { symbols -> selectFavorite(symbols) }
-                )
+            items(count = ratesLazyPagingItems?.itemCount ?: 0) { index ->
+                val item = ratesLazyPagingItems?.get(index)
+                if (item != null) {
+                    CurrencyPriceItem(
+                        item = item,
+                        onClick = { symbols -> selectFavorite(symbols) }
+                    )
+                }
             }
         }
     }
@@ -128,10 +140,10 @@ fun AllRatesScreenPreview() {
     val ratesList = listOf(item, item, itemFav, itemFav, item)
 
     RateTrackerAppTheme {
-        AllRatesScreen(
-            state = RateTrackerState(
-                rates = ratesList
-            )
-        )
+//        AllRatesScreen(
+//            state = RateTrackerState(
+//                rates = ratesList
+//            )
+//        )
     }
 }

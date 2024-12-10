@@ -65,5 +65,9 @@ dependencies {
 
     implementation(libs.converter.moshi)
 
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.room)
+
+
     implementation(project(":domain"))
 }

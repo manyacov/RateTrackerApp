@@ -1,5 +1,6 @@
 package com.manyacov.data.rate_tracker.datasource.local.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
@@ -29,6 +30,9 @@ interface RateTrackerDao {
 
     @Query("DELETE FROM rate_entity")
     suspend fun clearRatesTable()
+
+    @Query("SELECT * FROM rate_entity ORDER BY symbols ASC")
+    fun getPagingRateListSortedBySymbolsAsc(): PagingSource<Int, RateEntity>
 
     @Query("SELECT * FROM rate_entity ORDER BY symbols ASC")
     suspend fun getRateListSortedBySymbolsAsc(): List<RateEntity>

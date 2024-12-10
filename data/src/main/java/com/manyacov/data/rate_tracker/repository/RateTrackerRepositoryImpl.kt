@@ -1,6 +1,10 @@
 package com.manyacov.data.rate_tracker.repository
 
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
 import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
@@ -18,6 +22,8 @@ import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RateTrackerRepositoryImpl @Inject constructor(
@@ -89,6 +95,63 @@ class RateTrackerRepositoryImpl @Inject constructor(
     }
 
 
+    override suspend fun loadLatestRates(
+        base: String,
+        filterType: String?
+    ): CustomResult<Flow<PagingData<CurrencyRateValue>>?> {
+        return safeCall {
+            //val result = rateTrackerApi.getLatestRates(base)
+            val result = mockLatestRates()
+
+            val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
+
+            val entities = result.rates.map { rate ->
+                rate.toEntityRateModel(
+                    isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
+                    date = result.date
+                )
+            }
+            localSource.rateTrackerDao.clearRatesTable()
+            localSource.rateTrackerDao.saveRatesList(entities)
+
+
+            Pager(
+                config = PagingConfig(pageSize = 20),
+                pagingSourceFactory = { localSource.rateTrackerDao.getPagingRateListSortedBySymbolsAsc() }
+            ).flow.map { pagingData ->
+                pagingData.map { entity ->
+                    entity.toDomainModels()
+                }
+            }
+
+
+//            Log.println(Log.ERROR, "TTTT impl", filterType.toString())
+//
+//            val c = localSource.rateTrackerDao.getPagingRateListSortedBySymbolsAsc()
+//
+//
+//
+//            val r = c.map
+//
+//            val cached = when (filterType) {
+//                null, "Code A-Z" -> {
+//                    localSource.rateTrackerDao.getRateListSortedBySymbolsAsc()
+//                }
+//                "Code Z-A" -> {
+//                    localSource.rateTrackerDao.getRateListSortedBySymbolsDesc()
+//                }
+//                "Quote Asc." -> {
+//                    localSource.rateTrackerDao.getRateListSortedByQuoteAsc()
+//                }
+//                else -> {
+//                    localSource.rateTrackerDao.getRateListSortedByQuoteDesc()
+//                }
+//            }
+//            cached.map { it.toDomainModels() }
+        }
+    }
+
+
     override suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?> {
         return safeCall {
             val pairs = localSource.rateTrackerDao.getFavoriteRatesList()
@@ -152,9 +215,11 @@ class RateTrackerRepositoryImpl @Inject constructor(
         date = "09.12.2024",
         rates = mapOf(
             "USD" to 1.0,
-            "EUR" to 0.2431,
-            "BYN" to 3.5423
-        ),
+        ).plus((1..1000).map { index ->
+            val code = "CUR${index.toString().padStart(3, '0')}"
+            val value = (1..100).random() / 100.0
+            code to value
+        }).toMap(),
         success = true,
         timestamp = 524854725934
     )

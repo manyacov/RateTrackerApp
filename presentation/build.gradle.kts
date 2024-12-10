@@ -68,4 +68,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":ui"))
     debugImplementation(libs.ui.tooling)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 }

@@ -8,6 +8,7 @@ import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 data class RateTrackerState(
     val symbols: List<CurrencySymbols> = listOf(CurrencySymbols("")),
     val rates: List<CurrencyRateValue>? = null,
+    val ratesPagedData: List<CurrencyRateValue>? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
