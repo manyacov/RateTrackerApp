@@ -87,7 +87,7 @@ fun AllRatesScreen(
                     itemsList = state.symbols
                 )
                 FilterItem(
-                    onClick = { navController?.navigate("Filters") }
+                    onClick = { navController?.navigate("filters/{filter_type}") }
                 )
             }
         }

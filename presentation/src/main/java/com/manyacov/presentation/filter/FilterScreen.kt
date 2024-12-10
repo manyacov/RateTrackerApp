@@ -32,6 +32,7 @@ import com.manyacov.ui.theme.HeaderBg
 @Composable
 fun FilterScreen(
     modifier: Modifier = Modifier,
+    filterType: String?,
     navController: NavHostController? = null
 ) {
     val selectedOption = remember { mutableStateOf("Code A-Z") }
@@ -119,7 +120,7 @@ fun FilterScreen(
 
         BlueThemeButton(
             label = stringResource(id = R.string.apply),
-            onClick = { navController?.navigate("Currencies/${selectedOption.value}") }
+            onClick = { navController?.navigate("currencies/${selectedOption.value}") }
         )
     }
 }
@@ -128,6 +129,8 @@ fun FilterScreen(
 @Composable
 fun FilterScreenPreview() {
     RateTrackerAppTheme {
-        FilterScreen()
+        FilterScreen(
+            filterType = null
+        )
     }
 }

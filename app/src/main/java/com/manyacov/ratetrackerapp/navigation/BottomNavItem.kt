@@ -2,11 +2,9 @@ package com.manyacov.ratetrackerapp.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class BottomNav(
+open class BottomNavItem(
     val path: String,
-    @StringRes val nameRes: Int,
+    @StringRes val titleRes: Int,
     @DrawableRes val iconRes: Int
 )
