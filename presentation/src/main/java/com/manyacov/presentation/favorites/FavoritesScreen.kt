@@ -26,12 +26,12 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
+import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.ui.theme.Outline
 
 @Composable
 fun FavoritesScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController? = null,
     viewModel: FavoritesViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -39,7 +39,6 @@ fun FavoritesScreen(
     FavoritesScreen(
         state = state,
         modifier = modifier,
-        navController = navController,
         removeFavoritePair = { base, symbols ->
             viewModel.removeFavoritePair(base, symbols)
         }
@@ -50,10 +49,8 @@ fun FavoritesScreen(
 fun FavoritesScreen(
     state: FavoritesTrackerState,
     modifier: Modifier = Modifier,
-    navController: NavHostController? = null,
     removeFavoritePair: (String, String) -> Unit = { _, _ -> }
 ) {
-
     Column(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -75,6 +72,8 @@ fun FavoritesScreen(
                 .fillMaxWidth()
                 .background(color = Outline)
         )
+
+        Loader(state.isLoading)
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -105,9 +104,7 @@ fun AllRatesScreenPreview() {
 
     RateTrackerAppTheme {
         FavoritesScreen(
-            state = FavoritesTrackerState(
-                listFavorites = list
-            )
+            state = FavoritesTrackerState(listFavorites = list)
         )
     }
 }

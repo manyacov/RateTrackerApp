@@ -61,7 +61,7 @@ fun MainScreen(navController: NavHostController) {
                 enterTransition = { fadeIn(animationSpec = tween(500)) })
             {
                 val viewModel = hiltViewModel<FavoritesViewModel>()
-                FavoritesScreen(navController = navController, viewModel = viewModel)
+                FavoritesScreen(viewModel = viewModel)
                 bottomBarState.value = true
             }
             composable(NavItem.Filters.path,

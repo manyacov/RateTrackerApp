@@ -35,6 +35,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.manyacov.presentation.filter.getSortOptionByDescription
+import com.manyacov.presentation.ui_parts.Loader
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -115,6 +116,8 @@ fun AllRatesScreen(
                 .fillMaxWidth()
                 .background(color = Outline)
         )
+
+        Loader(state.isLoading)
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

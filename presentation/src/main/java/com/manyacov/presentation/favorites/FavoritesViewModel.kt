@@ -66,7 +66,7 @@ class FavoritesViewModel @Inject constructor(
         }
 
     private suspend fun removeFavorite(baseSymbols: String, symbols: String) {
-        when (val result = repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
+        when (repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
             is CustomResult.Success -> {
                 getFavoritesList()
             }
