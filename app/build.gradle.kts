@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 
-    //alias(libs.plugins.jetbrainsKotlinJvm)
+    alias(libs.plugins.compose.compiler)
 
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.dagger.hilt.android)
@@ -45,13 +45,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures {
-        compose = true
-//        buildConfig = true
-    }
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.5.1"
-//    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
