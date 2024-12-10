@@ -25,17 +25,11 @@ class AllRatesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RateTrackerState())
-    val state = _state
-//        .onStart {
-//            Log.println(Log.ERROR, "TTTT", "onStart")
-//
-//            getCurrencySymbols()
-//        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            RateTrackerState(isLoading = true, error = null)
-        )
+    val state = _state.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        RateTrackerState(isLoading = true, error = null)
+    )
 
     private var _rateValues: Flow<PagingData<CurrencyRateValue>>? = null
 
@@ -44,17 +38,19 @@ class AllRatesViewModel @Inject constructor(
 
 
     fun getCurrencySymbols() = viewModelScope.launch(Dispatchers.IO) {
-        when(val result = repository.getCurrencySymbols()) {
+        when (val result = repository.getCurrencySymbols()) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", result.data.toString())
                 _state.update {
                     it.copy(
                         symbols = result.data ?: listOf(CurrencySymbols("")),
+                        baseSymbols = result.data?.get(0)?.symbols ?: "",
                         isLoading = false,
                         error = null
                     )
                 }
             }
+
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")
 
@@ -69,10 +65,13 @@ class AllRatesViewModel @Inject constructor(
         }
     }
 
-    fun getLatestRates(base: String, sortOption: SortOptions?) = viewModelScope.launch(Dispatchers.IO) {
-        when(val result = repository.loadLatestRates(base, sortOption.toString())) {
-            is CustomResult.Success -> {
-                Log.println(Log.ERROR, "SSSS", result.data.toString())
+    fun getLatestRates(base: String, sortOption: SortOptions?) =
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(baseSymbols = base) }
+
+            when (val result = repository.loadLatestRates(base, sortOption.toString())) {
+                is CustomResult.Success -> {
+                    Log.println(Log.ERROR, "SSSS", result.data.toString())
 //                _state.update {
 //                    it.copy(
 //                        rates = result.data,
@@ -80,21 +79,22 @@ class AllRatesViewModel @Inject constructor(
 //                        error = null
 //                    )
 //                }
-                _rateValues = result.data
-            }
-            is CustomResult.Error -> {
-                Log.println(Log.ERROR, "SSSS_n", "")
+                    _rateValues = result.data
+                }
 
-                _state.update {
-                    it.copy(
-                        rates = null,
-                        isLoading = false,
-                        error = result.message
-                    )
+                is CustomResult.Error -> {
+                    Log.println(Log.ERROR, "SSSS_n", "")
+
+                    _state.update {
+                        it.copy(
+                            //rates = null,
+                            isLoading = false,
+                            error = result.message
+                        )
+                    }
                 }
             }
         }
-    }
 
 //    fun applyFilter(base: String, filterType: String?) = viewModelScope.launch(Dispatchers.IO) {
 //        Log.println(Log.ERROR, "TTTT", "applyFilter")
@@ -125,19 +125,20 @@ class AllRatesViewModel @Inject constructor(
 //        }
 //    }
 
-    fun selectFavorite(base: String, symbols: String) = viewModelScope.launch(Dispatchers.IO) {
-        when(val result = repository.changeFavoriteStatus(base, symbols)) {
+    fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
+        when (val result = repository.changeFavoriteStatus(state.value.baseSymbols, symbols)) {
             is CustomResult.Success -> {
                 Log.println(Log.ERROR, "SSSS", "selectFavorite")
 
-                getLatestRates("USD", null)
+                getLatestRates(state.value.baseSymbols, null)
             }
+
             is CustomResult.Error -> {
                 Log.println(Log.ERROR, "SSSS_n", "")
 
                 _state.update {
                     it.copy(
-                        rates = null,
+                        //rates = null,
                         isLoading = false,
                         error = result.message
                     )

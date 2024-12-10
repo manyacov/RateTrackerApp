@@ -61,7 +61,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
     ): CustomResult<Flow<PagingData<CurrencyRateValue>>?> {
         return safeCall {
             //val result = rateTrackerApi.getLatestRates(base)
-            val result = mockLatestRates()
+            val result = mockLatestRates(base)
 
             val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
 
@@ -152,14 +152,14 @@ class RateTrackerRepositoryImpl @Inject constructor(
         )
     )
 
-    fun mockLatestRates() = RatesDto(
-        base = "USD",
+    fun mockLatestRates(base: String) = RatesDto(
+        base = base,
         date = "09.12.2024",
         rates = mapOf(
             "USD" to 1.0,
         ).plus((1..1000).map { index ->
             val code = "CUR${index.toString().padStart(3, '0')}"
-            val value = (1..100).random() / 100.0
+            val value = (1..100).random() / 10.0
             code to value
         }).toMap(),
         success = true,

@@ -39,7 +39,8 @@ import com.manyacov.ui.R
 @Composable
 fun SymbolsDropdownMenu(
     modifier: Modifier = Modifier,
-    itemsList: List<CurrencySymbols> = listOf(CurrencySymbols("TEMP")),
+    itemsList: List<CurrencySymbols> = listOf(),
+    onSelect: (String) -> Unit = {}
 ) {
     var expanded by remember(key1 = itemsList) { mutableStateOf(false) }
     var selectedCurrency by remember(key1 = itemsList) { mutableStateOf(itemsList[0]) }
@@ -47,7 +48,6 @@ fun SymbolsDropdownMenu(
     Column(
         modifier = modifier
             .fillMaxWidth(),
-            //.height(48.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center
     ) {
@@ -82,7 +82,6 @@ fun SymbolsDropdownMenu(
                 .background(Color.White, shape = roundedCorner8)
                 .border(border = BorderStroke(1.dp, Secondary), shape = roundedCorner8)
                 .height(150.dp),
-//                .padding(16.dp),
         ) {
             itemsList.forEach { currency ->
                 DropdownMenuItem(
@@ -103,6 +102,7 @@ fun SymbolsDropdownMenu(
                     },
                     onClick = {
                         selectedCurrency = currency
+                        onSelect(currency.symbols)
                         expanded = false
                     },
                     modifier = modifier.fillMaxWidth()

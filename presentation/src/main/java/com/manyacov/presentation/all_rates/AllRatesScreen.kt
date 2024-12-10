@@ -58,7 +58,7 @@ fun AllRatesScreen(
         Log.println(Log.ERROR, "TTTT LaunchedEffect filterType", filterType.toString())
 
         //viewModel.applyFilter("USD", filterType)
-        viewModel.getLatestRates("USD", filterType.getSortOptionByDescription())
+        viewModel.getLatestRates(state.baseSymbols, filterType.getSortOptionByDescription())
     }
 
     AllRatesScreen(
@@ -68,7 +68,11 @@ fun AllRatesScreen(
         modifier = modifier,
         navController = navController,
         selectFavorite = { symbols ->
-            viewModel.selectFavorite(state.symbols.first().symbols, symbols)
+            viewModel.selectFavorite(symbols)
+        },
+        changeBaseCurrency = { baseSymbols ->
+            Log.println(Log.ERROR, "OOOO", baseSymbols)
+            viewModel.getLatestRates(baseSymbols, filterType.getSortOptionByDescription())
         }
     )
 }
@@ -80,7 +84,8 @@ fun AllRatesScreen(
     ratesLazyPagingItems: LazyPagingItems<CurrencyRateValue>?,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
-    selectFavorite: (String) -> Unit = {}
+    selectFavorite: (String) -> Unit = {},
+    changeBaseCurrency: (String) -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -102,8 +107,12 @@ fun AllRatesScreen(
             ) {
                 SymbolsDropdownMenu(
                     modifier = modifier.weight(1f),
-                    itemsList = state.symbols
+                    itemsList = state.symbols,
+                    onSelect = changeBaseCurrency
                 )
+//                LargeDropdown(
+//                    modifier = modifier.weight(1f),
+//                )
                 FilterItem(
                     onClick = { navController?.navigate("filters/$filterType") }
                 )

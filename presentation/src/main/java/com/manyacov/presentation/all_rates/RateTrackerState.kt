@@ -7,8 +7,7 @@ import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 @Immutable
 data class RateTrackerState(
     val symbols: List<CurrencySymbols> = listOf(CurrencySymbols("")),
-    val rates: List<CurrencyRateValue>? = null,
-    val ratesPagedData: List<CurrencyRateValue>? = null,
+    val baseSymbols: String = "",
     val isLoading: Boolean = false,
     val error: String? = null
 )
