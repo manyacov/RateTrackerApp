@@ -91,34 +91,11 @@ fun FilterScreen(
             )
         }
 
-        // Code sort options
-//        SortOption(
-//            text = "Code A-Z",
-//            isSelected = selectedOption.value == "Code A-Z",
-//            onClick = { selectedOption.value = "Code A-Z" }
-//        )
-//
-//        SortOption(
-//            text = "Code Z-A",
-//            isSelected = selectedOption.value == "Code Z-A",
-//            onClick = { selectedOption.value = "Code Z-A" }
-//        )
-//
-//        SortOption(
-//            text = "Quote Asc.",
-//            isSelected = selectedOption.value == "Quote Asc.",
-//            onClick = { selectedOption.value = "Quote Asc." }
-//        )
-//
-//        SortOption(
-//            text = "Quote Desc.",
-//            isSelected = selectedOption.value == "Quote Desc.",
-//            onClick = { selectedOption.value = "Quote Desc." }
-//        )
-
         Spacer(modifier = modifier.weight(1f))
 
         BlueThemeButton(
+            modifier = Modifier
+                .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
             label = stringResource(id = R.string.apply),
             onClick = { navController?.navigate("currencies/${selectedOption.value}") }
         )

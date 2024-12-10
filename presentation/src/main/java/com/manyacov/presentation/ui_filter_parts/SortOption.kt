@@ -41,7 +41,7 @@ fun SortOption(
         )
 
         RadioButton(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.space_size_14)),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.space_size_12)),
             selected = isSelected,
             onClick = onClick,
             colors = RadioButtonDefaults.colors(
