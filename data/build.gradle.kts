@@ -19,6 +19,7 @@ android {
         consumerProguardFiles("consumer-rules.pro")
 
         buildConfigField("String", "RATE_TRACKER_API_KEY", "\"6VptZxoNJFzJbLA7wnFozg4UyZgExu53\"")
+        //buildConfigField("String", "RATE_TRACKER_API_KEY", "\"JXNY5FgPy5XwPy8asLAj257QohWbM9X5\"")
         buildConfigField("String", "RATE_TRACKER_API_BASE_URL", "\"https://api.apilayer.com/exchangerates_data/\"")
     }
 
@@ -48,13 +49,11 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.logging.interceptor)
+    implementation(libs.converter.moshi)
 
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.compiler)
@@ -63,11 +62,12 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
 
-    implementation(libs.converter.moshi)
-
-    implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.room)
+    implementation(libs.androidx.paging.runtime)
 
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(project(":domain"))
 }

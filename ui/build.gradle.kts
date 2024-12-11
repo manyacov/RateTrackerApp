@@ -26,14 +26,6 @@ android {
         }
     }
 
-//    buildFeatures {
-//        compose = true
-//    }
-
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.5.1"
-//    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -48,7 +40,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3.android)
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
