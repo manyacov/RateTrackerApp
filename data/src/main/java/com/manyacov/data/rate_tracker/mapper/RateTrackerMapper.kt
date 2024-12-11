@@ -68,10 +68,12 @@ fun RateEntity.toDomainModels(): CurrencyRateValue {
 //    }
 //}
 
-fun RatesDto.toDomainModel(): FavoriteRatesValue {
-    return FavoriteRatesValue(
-        baseSymbols = this.base,
-        symbols = this.rates.keys.first(),
-        value = this.rates.values.first()
-    )
+fun RatesDto.toDomainModels(): List<FavoriteRatesValue> {
+    return rates.map { (symbol, value) ->
+        FavoriteRatesValue(
+            baseSymbols = base,
+            symbols = symbol,
+            value = value
+        )
+    }
 }

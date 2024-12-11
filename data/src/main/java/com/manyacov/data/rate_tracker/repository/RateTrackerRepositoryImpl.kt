@@ -97,13 +97,19 @@ class RateTrackerRepositoryImpl @Inject constructor(
     override suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?> {
         return safeCall {
             val pairs = localSource.rateTrackerDao.getFavoriteRatesList()
-            return@safeCall if (pairs.isNotEmpty()) {
-                val result = pairs.map {
-                    mockLatestRatesByBaseEUR(it.baseSymbols, it.symbols)
-                    //rateTrackerApi.getLatestRatesForPair(it.baseSymbols, it.symbols)
+            val favoritePairs = pairs
+                .groupBy { it.baseSymbols }
+                .mapValues { entry ->
+                    entry.value.mapNotNull { it.symbols }
                 }
-                result.map {
-                    it.toDomainModel()
+
+            return@safeCall if (pairs.isNotEmpty()) {
+                val result = favoritePairs.map {
+                    rateTrackerApi.getLatestRatesForPair(it.key, it.value.joinToString())
+                }
+
+                result.flatMap { ratesDto ->
+                    ratesDto.toDomainModels()
                 }
             } else {
                 emptyList<FavoriteRatesValue>()
