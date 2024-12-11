@@ -3,6 +3,7 @@ package com.manyacov.ratetrackerapp.navigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.manyacov.ui.theme.LightPrimary
+import com.manyacov.ui.theme.Primary
+import com.manyacov.ui.theme.Secondary
+import com.manyacov.ui.theme.TextDefault
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -41,7 +46,14 @@ fun BottomNavigationBar(navController: NavHostController) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Primary,
+                    unselectedIconColor = Secondary,
+                    selectedTextColor = TextDefault,
+                    unselectedTextColor = Secondary,
+                    indicatorColor = LightPrimary
+                )
             )
         }
     }
