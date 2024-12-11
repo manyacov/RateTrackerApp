@@ -26,8 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.ui.theme.LightPrimary
@@ -59,7 +59,10 @@ fun SymbolsDropdownMenu(
     Box(
         modifier = modifier
             .clip(roundedCorner8)
-            .border(border = BorderStroke(1.dp, Secondary), shape = roundedCorner8)
+            .border(
+                border = BorderStroke(dimensionResource(id = R.dimen.space_size_1), Secondary),
+                shape = roundedCorner8
+            )
     ) {
         OutlinedTextField(
             textStyle = MaterialTheme.typography.displayMedium,
@@ -142,7 +145,7 @@ fun CurrencyDropdownMenuItem(
         .fillMaxWidth()
     ) {
         Text(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.space_size_16)),
             text = text,
             style = MaterialTheme.typography.displayMedium,
         )

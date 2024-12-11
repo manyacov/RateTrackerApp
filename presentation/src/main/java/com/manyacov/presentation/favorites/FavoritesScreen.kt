@@ -17,12 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.EmptyDescription
@@ -57,8 +56,11 @@ fun FavoritesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = HeaderBg)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.space_size_16),
+                    vertical = dimensionResource(id = R.dimen.space_size_12)
+                ),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.space_size_18))
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -69,7 +71,7 @@ fun FavoritesScreen(
 
         Spacer(
             modifier = Modifier
-                .height(1.dp)
+                .height(dimensionResource(id = R.dimen.space_size_1))
                 .fillMaxWidth()
                 .background(color = Outline)
         )
@@ -83,7 +85,7 @@ fun FavoritesScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
         ) {
             items(state.listFavorites ?: listOf()) { item ->
                 FavoritesPriceItem(

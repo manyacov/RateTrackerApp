@@ -8,17 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
-import com.manyacov.ui.theme.DefaultBg
-import com.manyacov.ui.theme.Primary
-import com.manyacov.ui.theme.Secondary
 import com.manyacov.ui.theme.roundedCorner8
 
 @Composable
@@ -28,17 +26,22 @@ fun FilterItem(
 ) {
     Box(
         modifier = modifier
-            .size(48.dp)
+            .size(dimensionResource(id = R.dimen.space_size_48))
             .clip(shape = roundedCorner8)
-            .border(border = BorderStroke(1.dp, Secondary), shape = roundedCorner8)
-            .background(DefaultBg)
+            .border(
+                border = BorderStroke(
+                    dimensionResource(id = R.dimen.space_size_1),
+                    MaterialTheme.colorScheme.secondary
+                ), shape = roundedCorner8
+            )
+            .background(MaterialTheme.colorScheme.background)
             .clickable { onClick() }
-            .padding(12.dp)
+            .padding(dimensionResource(id = R.dimen.space_size_12))
     ) {
         Icon(
-            modifier = modifier.size(24.dp),
+            modifier = modifier.size(dimensionResource(id = R.dimen.space_size_24)),
             painter = painterResource(id = R.drawable.ic_filter),
-            tint = Primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = ""
         )
     }
