@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
 
-@Entity(tableName = "favorites")
+@Entity(tableName = "favorites_table")
 data class FavoritePairEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

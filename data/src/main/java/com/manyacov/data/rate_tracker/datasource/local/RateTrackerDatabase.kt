@@ -2,12 +2,9 @@ package com.manyacov.data.rate_tracker.datasource.local
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.DatabaseConfiguration
-import androidx.room.InvalidationTracker
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.manyacov.data.rate_tracker.datasource.local.dao.RateTrackerDao
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
 import com.manyacov.data.rate_tracker.datasource.local.model.RateEntity
@@ -18,23 +15,15 @@ class RateTrackerDatabase internal constructor(private val database: RateTracker
         get() = database.rateTrackerDao()
 }
 
-@Database(entities = [SymbolsEntity::class, RateEntity::class, FavoritePairEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [SymbolsEntity::class, RateEntity::class, FavoritePairEntity::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(Converters::class)
-internal abstract class RateTrackerRoomDatabase: RoomDatabase() {
+internal abstract class RateTrackerRoomDatabase : RoomDatabase() {
 
     abstract fun rateTrackerDao(): RateTrackerDao
-
-    override fun clearAllTables() {
-        TODO("Not yet implemented")
-    }
-
-    override fun createInvalidationTracker(): InvalidationTracker {
-        TODO("Not yet implemented")
-    }
-
-    override fun createOpenHelper(config: DatabaseConfiguration): SupportSQLiteOpenHelper {
-        TODO("Not yet implemented")
-    }
 }
 
 fun RateTrackerDatabase(applicationContext: Context): RateTrackerDatabase {
