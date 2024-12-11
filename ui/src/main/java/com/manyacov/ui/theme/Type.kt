@@ -13,7 +13,6 @@ val interFontFamily = FontFamily(
     Font(R.font.inter_18pt_bold, FontWeight.Bold)
 )
 
-// Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = interFontFamily,
@@ -31,20 +30,13 @@ val Typography = Typography(
         letterSpacing = 0.5.sp,
         color = TextDefault
     ),
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+
+    displayMedium = TextStyle(
+        fontFamily = interFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.5.sp,
+        color = TextDefault
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
 )

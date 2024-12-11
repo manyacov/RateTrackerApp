@@ -30,6 +30,9 @@ import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
@@ -88,6 +91,8 @@ fun AllRatesScreen(
     selectFavorite: (String) -> Unit = {},
     changeBaseCurrency: (String) -> Unit = {}
 ) {
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
     Column(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -106,14 +111,19 @@ fun AllRatesScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 SymbolsDropdownMenu(
-                    modifier = modifier.weight(1f),
-                    itemsList = state.symbols,
-                    onSelect = changeBaseCurrency
+                    modifier = Modifier
+                        .height(48.dp)
+                        .weight(1f),
+                    items = state.symbols,
+                    selectedIndex = selectedIndex,
+                    onItemSelected = { index, item ->
+                        selectedIndex = index
+                        changeBaseCurrency(item.symbols)
+                    },
                 )
-//                LargeDropdown(
-//                    modifier = modifier.weight(1f),
-//                )
+
                 FilterItem(
                     onClick = { navController?.navigate("filters/$filterType") }
                 )
