@@ -25,6 +25,7 @@ import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
+import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.ui.theme.Outline
@@ -74,6 +75,11 @@ fun FavoritesScreen(
         )
 
         Loader(state.isLoading)
+
+        EmptyDescription(
+            isEmpty = state.listFavorites?.isEmpty() == true && !state.isLoading,
+            stringResource(R.string.favorites_empty)
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

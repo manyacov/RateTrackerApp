@@ -35,6 +35,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.manyacov.presentation.filter.getSortOptionByDescription
+import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.Loader
 
 
@@ -127,6 +128,11 @@ fun AllRatesScreen(
         )
 
         Loader(state.isLoading)
+
+        EmptyDescription(
+            isEmpty = ratesLazyPagingItems?.itemCount == 0,
+            stringResource(R.string.all_rates_empty)
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

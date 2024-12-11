@@ -10,4 +10,7 @@
     <string name="sort_z_a">Code Z-A</string>
     <string name="sort_asc">Quote Asc.</string>
     <string name="sort_desc">Quote Desc.</string>
+
+    <string name="all_rates_empty">There are no rates</string>
+    <string name="favorites_empty">You have not added any rates to your favorites</string>
 </resources>
