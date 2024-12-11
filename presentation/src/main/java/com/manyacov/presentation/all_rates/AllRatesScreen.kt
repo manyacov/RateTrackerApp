@@ -32,14 +32,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.manyacov.domain.rate_tracker.utils.NetworkIssues
 import com.manyacov.presentation.filter.getSortOptionByDescription
 import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.Loader
+import com.manyacov.presentation.ui_parts.NoInternetLine
+import com.manyacov.presentation.utils.isInternetAvailable
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -139,6 +143,8 @@ fun AllRatesScreen(
                 .fillMaxWidth()
                 .background(color = Outline)
         )
+
+        NoInternetLine(isInternetAvailable(LocalContext.current))
 
         Loader(state.isLoading)
 

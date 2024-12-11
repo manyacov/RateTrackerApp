@@ -21,12 +21,15 @@ import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
 import com.manyacov.presentation.ui_parts.Loader
+import com.manyacov.presentation.ui_parts.NoInternetLine
+import com.manyacov.presentation.utils.isInternetAvailable
 import com.manyacov.ui.theme.Outline
 
 @Composable
@@ -75,6 +78,8 @@ fun FavoritesScreen(
                 .fillMaxWidth()
                 .background(color = Outline)
         )
+
+        NoInternetLine(isInternetAvailable(LocalContext.current))
 
         Loader(state.isLoading)
 
