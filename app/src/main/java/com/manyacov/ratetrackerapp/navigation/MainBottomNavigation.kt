@@ -7,7 +7,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
@@ -21,7 +21,7 @@ import com.manyacov.ui.theme.TextDefault
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val navItems = listOf(NavItem.Currencies, NavItem.Favorites)
-    var selectedItem by rememberSaveable { mutableStateOf(0) }
+    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
 
     NavigationBar {
         navItems.forEachIndexed { index, item ->

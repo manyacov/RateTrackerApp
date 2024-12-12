@@ -29,6 +29,7 @@ import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
+import com.manyacov.presentation.utils.handleError
 import com.manyacov.presentation.utils.isInternetAvailable
 import com.manyacov.ui.theme.Outline
 
@@ -88,6 +89,11 @@ fun FavoritesScreen(
             stringResource(R.string.favorites_empty)
         )
 
+        EmptyDescription(
+            isEmpty = state.error != null,
+            description = stringResource(id = state.error.handleError())
+        )
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
@@ -113,11 +119,9 @@ fun AllRatesScreenPreview() {
         value = 0.48554
     )
 
-    val list = listOf(item, item, item)
-
     RateTrackerAppTheme {
         FavoritesScreen(
-            state = FavoritesTrackerState(listFavorites = list)
+            state = FavoritesTrackerState(listFavorites = List(3) { item })
         )
     }
 }

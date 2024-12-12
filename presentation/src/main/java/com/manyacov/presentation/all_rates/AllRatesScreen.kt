@@ -38,11 +38,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.manyacov.ui.theme.Outline
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.manyacov.domain.rate_tracker.utils.NetworkIssues
 import com.manyacov.presentation.filter.getSortOptionByDescription
 import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
+import com.manyacov.presentation.utils.handleError
 import com.manyacov.presentation.utils.isInternetAvailable
 
 
@@ -151,6 +151,11 @@ fun AllRatesScreen(
         EmptyDescription(
             isEmpty = ratesLazyPagingItems?.itemCount == 0,
             stringResource(R.string.all_rates_empty)
+        )
+
+        EmptyDescription(
+            isEmpty = state.error != null,
+            description = stringResource(id = state.error.handleError())
         )
 
         LazyColumn(

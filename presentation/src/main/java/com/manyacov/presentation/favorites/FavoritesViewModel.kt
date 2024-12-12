@@ -1,6 +1,5 @@
 package com.manyacov.presentation.favorites
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
@@ -34,9 +33,6 @@ class FavoritesViewModel @Inject constructor(
     private fun getFavoritesList() = viewModelScope.launch(Dispatchers.IO) {
         when (val result = repository.getFavoriteRates()) {
             is CustomResult.Success -> {
-
-                Log.println(Log.ERROR, "SSSS_s", result.data.toString())
-
                 _state.update {
                     it.copy(
                         listFavorites = result.data,
@@ -47,32 +43,35 @@ class FavoritesViewModel @Inject constructor(
             }
 
             is CustomResult.Error -> {
-                Log.println(Log.ERROR, "SSSS_n", "")
-
                 _state.update {
                     it.copy(
                         listFavorites = listOf(),
                         isLoading = false,
-                        error = result.message
+                        error = result.issueType
                     )
                 }
             }
         }
     }
 
-    fun removeFavoritePair(baseSymbols: String, symbols: String) =
-        viewModelScope.launch(Dispatchers.IO) {
+    fun removeFavoritePair(baseSymbols: String, symbols: String) = viewModelScope.launch(Dispatchers.IO) {
             removeFavorite(baseSymbols, symbols)
         }
 
     private suspend fun removeFavorite(baseSymbols: String, symbols: String) {
-        when (repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
+        when (val result = repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
             is CustomResult.Success -> {
                 getFavoritesList()
             }
 
             is CustomResult.Error -> {
-                Log.println(Log.ERROR, "SSSS_n", "")
+                _state.update {
+                    it.copy(
+                        listFavorites = listOf(),
+                        isLoading = false,
+                        error = result.issueType
+                    )
+                }
             }
         }
     }

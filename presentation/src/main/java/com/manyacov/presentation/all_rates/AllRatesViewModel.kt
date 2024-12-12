@@ -58,7 +58,7 @@ class AllRatesViewModel @Inject constructor(
                     it.copy(
                         symbols = listOf(CurrencySymbols("")),
                         isLoading = false,
-                        error = result.message
+                        error = result.issueType
                     )
                 }
             }
@@ -89,7 +89,7 @@ class AllRatesViewModel @Inject constructor(
                         it.copy(
                             //rates = null,
                             isLoading = false,
-                            error = result.message
+                            error = result.issueType
                         )
                     }
                 }
@@ -140,7 +140,7 @@ class AllRatesViewModel @Inject constructor(
                     it.copy(
                         //rates = null,
                         isLoading = false,
-                        error = result.message
+                        error = result.issueType
                     )
                 }
             }

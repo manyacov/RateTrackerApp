@@ -13,4 +13,9 @@
 
     <string name="all_rates_empty">There are no rates</string>
     <string name="favorites_empty">You have not added any rates to your favorites</string>
+
+    <string name="timeout_error">Timeout error</string>
+    <string name="no_internet_error">No internet error</string>
+    <string name="other_error">Something went wrong.\nPlease, try again later</string>
+    <string name="no_internet">No internet connection. Data won\'t be loaded</string>
 </resources>
