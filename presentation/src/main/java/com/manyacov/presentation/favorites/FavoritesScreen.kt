@@ -110,12 +110,19 @@ fun FavoritesScreen(
                 )
             }
         }
+
+        Spacer(
+            modifier = Modifier
+                .height(dimensionResource(id = R.dimen.space_size_1))
+                .fillMaxWidth()
+                .background(color = Outline)
+        )
     }
 }
 
 @Preview
 @Composable
-fun AllRatesScreenPreview() {
+fun FavoritesScreenPreview() {
     val item = FavoriteRatesValue(
         baseSymbols = "USD",
         symbols = "EUR",

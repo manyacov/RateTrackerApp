@@ -108,7 +108,7 @@ fun AllRatesScreen(
                 )
 
                 FilterItem(
-                    onClick = { navController?.navigate("filters/filterType") }
+                    onClick = { navController?.navigate("filters") }
                 )
             }
         }
@@ -145,6 +145,13 @@ fun AllRatesScreen(
                 )
             }
         }
+
+        Spacer(
+            modifier = Modifier
+                .height(dimensionResource(id = R.dimen.space_size_1))
+                .fillMaxWidth()
+                .background(color = Outline)
+        )
     }
 }
 

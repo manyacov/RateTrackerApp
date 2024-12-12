@@ -1,6 +1,7 @@
 package com.manyacov.ratetrackerapp.navigation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -23,8 +24,9 @@ fun BottomNavigationBar(navController: NavHostController) {
     val navItems = listOf(NavItem.Currencies, NavItem.Favorites)
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
 
-    NavigationBar {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.background) {
         navItems.forEachIndexed { index, item ->
+
             NavigationBarItem(
                 alwaysShowLabel = true,
                 icon = {
