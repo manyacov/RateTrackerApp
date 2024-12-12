@@ -11,7 +11,6 @@ activityCompose = "1.9.3"
 composeBom = "2023.08.00"
 
 loggingInterceptor = "5.0.0-alpha.3"
-pagingRuntimeVersion = "3.3.4"
 retrofit = "2.11.0"
 converterMoshi = "2.9.0"
 
@@ -29,7 +28,6 @@ uiAndroid = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntimeVersion" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -64,9 +62,6 @@ dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref =
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
-
-androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingRuntimeVersion" }
-androidx-paging-room = { group = "androidx.room", name = "room-paging", version.ref = "room_version" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

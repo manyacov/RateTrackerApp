@@ -12,8 +12,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -21,6 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import com.manyacov.presentation.all_rates.AllRatesViewModel
+import com.manyacov.presentation.all_rates.RateTrackerState
 import com.manyacov.presentation.ui_filter_parts.BlueThemeButton
 import com.manyacov.presentation.ui_filter_parts.SortOption
 import com.manyacov.ui.theme.RateTrackerAppTheme
@@ -32,11 +32,29 @@ import com.manyacov.ui.theme.HeaderBg
 @Composable
 fun FilterScreen(
     modifier: Modifier = Modifier,
-    filterType: String?,
-    navController: NavHostController? = null
+    navController: NavHostController? = null,
+    viewModel: AllRatesViewModel
 ) {
-    val selectedOption = remember { mutableStateOf(filterType.getSortOptionByDescription()) }
 
+    val filterState = viewModel.state
+
+    FilterScreen(
+        modifier = modifier,
+        filterState = filterState,
+        navController = navController,
+        updateFilterOption = { filterOption ->
+            viewModel.updateFilterOption(filterOption)
+        }
+    )
+}
+
+@Composable
+fun FilterScreen(
+    modifier: Modifier = Modifier,
+    filterState: RateTrackerState,
+    navController: NavHostController? = null,
+    updateFilterOption: (SortOptions) -> Unit = {}
+) {
     Column(
         modifier = modifier
             .padding(bottom = dimensionResource(id = R.dimen.space_size_16)),
@@ -87,8 +105,8 @@ fun FilterScreen(
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
                 text = title,
-                isSelected = selectedOption.value == it,
-                onClick = { selectedOption.value = it }
+                isSelected = filterState.filterOption == it,
+                onClick = { updateFilterOption(it) }
             )
         }
 
@@ -98,7 +116,9 @@ fun FilterScreen(
             modifier = Modifier
                 .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
             label = stringResource(id = R.string.apply),
-            onClick = { navController?.navigate("currencies/${selectedOption.value}") }
+            onClick = {
+                navController?.navigateUp()
+            }
         )
     }
 }
@@ -107,8 +127,6 @@ fun FilterScreen(
 @Composable
 fun FilterScreenPreview() {
     RateTrackerAppTheme {
-        FilterScreen(
-            filterType = null
-        )
+        FilterScreen(filterState = RateTrackerState())
     }
 }

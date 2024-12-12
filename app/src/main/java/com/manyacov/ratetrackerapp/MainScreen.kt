@@ -40,19 +40,17 @@ fun MainScreen(navController: NavHostController) {
             navController.navigateUp()
         }
 
+        val allRatesViewModel = hiltViewModel<AllRatesViewModel>()
+        val favoritesViewModel = hiltViewModel<FavoritesViewModel>()
+
         NavHost(navController, startDestination = NavItem.Currencies.path) {
             composable(
                 route = NavItem.Currencies.path,
                 enterTransition = { fadeIn(animationSpec = tween(500)) }
-            ) { backStackEntry ->
-                val viewModel = hiltViewModel<AllRatesViewModel>()
-
-                val filterType = backStackEntry.arguments?.getString("filter_type")
-
+            ) {
                 AllRatesScreen(
                     navController = navController,
-                    filterType = filterType,
-                    viewModel = viewModel
+                    viewModel = allRatesViewModel
                 )
                 bottomBarState.value = true
             }
@@ -60,18 +58,15 @@ fun MainScreen(navController: NavHostController) {
                 route = NavItem.Favorites.path,
                 enterTransition = { fadeIn(animationSpec = tween(500)) })
             {
-                val viewModel = hiltViewModel<FavoritesViewModel>()
-                FavoritesScreen(viewModel = viewModel)
+                FavoritesScreen(viewModel = favoritesViewModel)
                 bottomBarState.value = true
             }
             composable(NavItem.Filters.path,
                 enterTransition = { fadeIn(animationSpec = tween(500)) })
-            { backStackEntry ->
-                val filterType = backStackEntry.arguments?.getString("filter_type")
-
+            {
                 FilterScreen(
-                    filterType = filterType,
-                    navController = navController
+                    navController = navController,
+                    viewModel = allRatesViewModel
                 )
                 bottomBarState.value = false
             }

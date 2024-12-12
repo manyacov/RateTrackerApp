@@ -1,6 +1,5 @@
 package com.manyacov.data.rate_tracker.datasource.local.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
@@ -31,20 +30,17 @@ interface RateTrackerDao {
     @Query("DELETE FROM rates_table")
     suspend fun clearRatesTable()
 
-//    @Query("SELECT * FROM rates_table ORDER BY symbols ASC")
-//    fun getPagingRateListSortedBySymbolsAsc(): PagingSource<Int, RateEntity>
-
     @Query("SELECT * FROM rates_table ORDER BY symbols ASC")
-    fun getRateListSortedBySymbolsAsc(): PagingSource<Int, RateEntity>
+    fun getRateListSortedBySymbolsAsc(): List<RateEntity>
 
     @Query("SELECT * FROM rates_table ORDER BY symbols DESC")
-    fun getRateListSortedBySymbolsDesc(): PagingSource<Int, RateEntity>
+    fun getRateListSortedBySymbolsDesc(): List<RateEntity>
 
     @Query("SELECT * FROM rates_table ORDER BY value ASC")
-    fun getRateListSortedByQuoteAsc(): PagingSource<Int, RateEntity>
+    fun getRateListSortedByQuoteAsc(): List<RateEntity>
 
     @Query("SELECT * FROM rates_table ORDER BY value DESC")
-    fun getRateListSortedByQuoteDesc(): PagingSource<Int, RateEntity>
+    fun getRateListSortedByQuoteDesc(): List<RateEntity>
 
     @Query("SELECT * FROM favorites_table WHERE base_symbols = :base")
     suspend fun getFavoriteRatesListByBase(base: String): List<FavoritePairEntity>

@@ -14,16 +14,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
@@ -38,7 +37,11 @@ fun FavoritesScreen(
     modifier: Modifier = Modifier,
     viewModel: FavoritesViewModel
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state
+
+    LaunchedEffect(Unit) {
+        viewModel.getFavoritesList()
+    }
 
     FavoritesScreen(
         state = state,

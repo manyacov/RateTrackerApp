@@ -1,16 +1,14 @@
 package com.manyacov.presentation.favorites
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,42 +17,32 @@ class FavoritesViewModel @Inject constructor(
     private val repository: RateTrackerRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(FavoritesTrackerState())
-    val state = _state
-        .onStart {
-            getFavoritesList()
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            FavoritesTrackerState(isLoading = true, error = null)
-        )
+    var state by mutableStateOf(FavoritesTrackerState(isLoading = true))
+        private set
 
-    private fun getFavoritesList() = viewModelScope.launch(Dispatchers.IO) {
+    fun getFavoritesList() = viewModelScope.launch(Dispatchers.IO) {
         when (val result = repository.getFavoriteRates()) {
             is CustomResult.Success -> {
-                _state.update {
-                    it.copy(
-                        listFavorites = result.data,
-                        isLoading = false,
-                        error = null
-                    )
-                }
+                state = state.copy(
+                    listFavorites = result.data,
+                    isLoading = false,
+                    error = null
+                )
             }
 
             is CustomResult.Error -> {
-                _state.update {
-                    it.copy(
-                        listFavorites = listOf(),
-                        isLoading = false,
-                        error = result.issueType
-                    )
-                }
+                state = state.copy(
+                    listFavorites = listOf(),
+                    isLoading = false,
+                    error = result.issueType
+                )
             }
         }
     }
 
-    fun removeFavoritePair(baseSymbols: String, symbols: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun removeFavoritePair(baseSymbols: String, symbols: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            state = state.copy(isLoading = true)
             removeFavorite(baseSymbols, symbols)
         }
 
@@ -65,13 +53,11 @@ class FavoritesViewModel @Inject constructor(
             }
 
             is CustomResult.Error -> {
-                _state.update {
-                    it.copy(
-                        listFavorites = listOf(),
-                        isLoading = false,
-                        error = result.issueType
-                    )
-                }
+                state = state.copy(
+                    listFavorites = listOf(),
+                    isLoading = false,
+                    error = result.issueType
+                )
             }
         }
     }
