@@ -6,6 +6,7 @@ import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
 import androidx.room.Query
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
 import com.manyacov.data.rate_tracker.datasource.local.model.RateEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RateTrackerDao {
@@ -31,16 +32,16 @@ interface RateTrackerDao {
     suspend fun clearRatesTable()
 
     @Query("SELECT * FROM rates_table ORDER BY symbols ASC")
-    fun getRateListSortedBySymbolsAsc(): List<RateEntity>
+    fun getRateListSortedBySymbolsAsc(): Flow<List<RateEntity>>
 
     @Query("SELECT * FROM rates_table ORDER BY symbols DESC")
-    fun getRateListSortedBySymbolsDesc(): List<RateEntity>
+    fun getRateListSortedBySymbolsDesc(): Flow<List<RateEntity>>
 
     @Query("SELECT * FROM rates_table ORDER BY value ASC")
-    fun getRateListSortedByQuoteAsc(): List<RateEntity>
+    fun getRateListSortedByQuoteAsc(): Flow<List<RateEntity>>
 
     @Query("SELECT * FROM rates_table ORDER BY value DESC")
-    fun getRateListSortedByQuoteDesc(): List<RateEntity>
+    fun getRateListSortedByQuoteDesc(): Flow<List<RateEntity>>
 
     @Query("SELECT * FROM favorites_table WHERE base_symbols = :base")
     suspend fun getFavoriteRatesListByBase(base: String): List<FavoritePairEntity>

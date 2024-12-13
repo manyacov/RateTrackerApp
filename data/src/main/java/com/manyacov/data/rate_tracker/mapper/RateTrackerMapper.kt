@@ -31,17 +31,6 @@ fun SymbolsEntity.toDomainModel(): CurrencySymbols {
     )
 }
 
-//fun RatesDto.toEntityModels(): List<RateEntity> {
-//    return this.rates.map {
-//        RateEntity(
-//            symbols = it.key,
-//            value = it.value,
-//            date = this.date,
-//            isFavorite = false
-//        )
-//    }
-//}
-
 fun  Map.Entry<String, Double>.toEntityRateModel(isFavorite: Boolean, date: String): RateEntity {
     return RateEntity(
         symbols = this.key,
@@ -53,20 +42,12 @@ fun  Map.Entry<String, Double>.toEntityRateModel(isFavorite: Boolean, date: Stri
 
 fun RateEntity.toDomainModels(): CurrencyRateValue {
     return CurrencyRateValue(
+        id = id,
         symbols = this.symbols,
         value = this.value,
         isFavorite = this.isFavorite
     )
 }
-
-//fun RatesDto.toDomainModels(): List<CurrencyRateValue> {
-//    return this.rates.map {
-//        CurrencyRateValue(
-//            symbols = it.key,
-//            value = it.value
-//        )
-//    }
-//}
 
 fun RatesDto.toDomainModels(): List<FavoriteRatesValue> {
     return rates.map { (symbol, value) ->

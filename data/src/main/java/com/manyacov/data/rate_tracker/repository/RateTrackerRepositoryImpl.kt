@@ -4,6 +4,7 @@ import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
 import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
+import com.manyacov.data.rate_tracker.datasource.remote.model.RatesDto
 import com.manyacov.data.rate_tracker.mapper.toDomainModel
 import com.manyacov.data.rate_tracker.mapper.toEntityModels
 import com.manyacov.data.rate_tracker.mapper.toDomainModels
@@ -15,7 +16,11 @@ import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlin.random.Random
+
 
 class RateTrackerRepositoryImpl @Inject constructor(
     private val rateTrackerApi: RateTrackerApi,
@@ -46,32 +51,73 @@ class RateTrackerRepositoryImpl @Inject constructor(
         base: String,
         filterType: String?,
         withSync: Boolean
-    ): CustomResult<List<CurrencyRateValue>?> {
-        return safeCall {
-            if (withSync) {
-                val result = rateTrackerApi.getLatestRates(base)
+    ): Flow<CustomResult<List<CurrencyRateValue>>?> {
 
-                val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
+        //safeCall {
+        if (withSync) {
+            //val result = mockRemote
 
-                val entities = result.rates.map { rate ->
-                    rate.toEntityRateModel(
-                        isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
-                        date = result.date
-                    )
-                }
-                localSource.rateTrackerDao.clearRatesTable()
-                localSource.rateTrackerDao.saveRatesList(entities)
+            val result = rateTrackerApi.getLatestRates(base)
+
+            val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
+
+            val entities = result.rates.map { rate ->
+                rate.toEntityRateModel(
+                    isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
+                    date = result.date
+                )
             }
+            localSource.rateTrackerDao.clearRatesTable()
+            localSource.rateTrackerDao.saveRatesList(entities)
+        }
 
-            when(filterType) {
-                "CODE_Z_A" -> localSource.rateTrackerDao.getRateListSortedBySymbolsDesc()
-                "QUOTE_ASC" -> localSource.rateTrackerDao.getRateListSortedByQuoteAsc()
-                "QUOTE_DESC" -> localSource.rateTrackerDao.getRateListSortedByQuoteDesc()
-                else -> localSource.rateTrackerDao.getRateListSortedBySymbolsAsc()
-            }.map { it.toDomainModels() }
+        val db = localSource.rateTrackerDao
+
+        return when (filterType) {
+            "CODE_Z_A" -> db.getRateListSortedBySymbolsDesc()
+            "QUOTE_ASC" -> db.getRateListSortedByQuoteAsc()
+            "QUOTE_DESC" -> db.getRateListSortedByQuoteDesc()
+            else -> db.getRateListSortedBySymbolsAsc()
+        }.map { rateEntities ->
+            val currencyRates = try {
+                rateEntities.map { entity -> entity.toDomainModels() }
+            } catch (e: Exception) {
+                throw e
+            }
+            CustomResult.Success(currencyRates)
         }
     }
 
+
+    //TODO: remove
+    private fun mockRemoteRates(): RatesDto {
+        val currencies = generateRandomStrings(200, 3)
+        val random = Random(System.currentTimeMillis())
+
+        val rates = mutableMapOf<String, Double>()
+        currencies.forEach {
+            rates[it] = random.nextDouble(1.0, 100.0)
+        }
+
+        return RatesDto(
+            base = "AED",
+            date = "2024-12-01",
+            rates = rates,
+            success = true,
+            timestamp = System.currentTimeMillis()
+        )
+    }
+
+    fun generateRandomStrings(count: Int, length: Int): List<String> {
+        val chars = ('A'..'Z').toList()
+        val random = Random(System.currentTimeMillis())
+
+        return List(count) {
+            (1..length)
+                .map { chars[random.nextInt(chars.size)] }
+                .joinToString("")
+        }
+    }
 
     override suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?> {
         return safeCall {

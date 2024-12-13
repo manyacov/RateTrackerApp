@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +50,10 @@ fun AllRatesScreen(
     viewModel: AllRatesViewModel,
 ) {
     val state = viewModel.state
+    val newState = viewModel.newState.collectAsState()
+
+    val listState = rememberLazyListState()
+
 
     LaunchedEffect(Unit) {
         viewModel.getCurrencySymbols()
@@ -53,6 +61,7 @@ fun AllRatesScreen(
 
     AllRatesScreen(
         state = state,
+        newState,
         modifier = modifier,
         navController = navController,
         selectFavorite = { symbols ->
@@ -60,17 +69,20 @@ fun AllRatesScreen(
         },
         changeBaseCurrency = { base ->
             viewModel.updateSelectedSymbols(base)
-        }
+        },
+        listState = listState
     )
 }
 
 @Composable
 fun AllRatesScreen(
     state: RateTrackerState,
+    newState: State<List<CurrencyRateValue>?>? = null,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
     selectFavorite: (String) -> Unit = {},
-    changeBaseCurrency: (CurrencySymbols) -> Unit = {}
+    changeBaseCurrency: (CurrencySymbols) -> Unit = {},
+    listState: LazyListState
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -135,10 +147,11 @@ fun AllRatesScreen(
         )
 
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
         ) {
-            items(state.ratesList) { item ->
+            items(newState?.value ?: listOf(), key = { it.id }) { item ->
                 CurrencyPriceItem(
                     item = item,
                     onClick = { symbols -> selectFavorite(symbols) }
@@ -159,11 +172,13 @@ fun AllRatesScreen(
 @Composable
 fun AllRatesScreenPreview() {
     val item = CurrencyRateValue(
+        id = 0,
         symbols = "USD",
         value = 0.45687,
         isFavorite = false
     )
     val itemFav = CurrencyRateValue(
+        id = 1,
         symbols = "USD",
         value = 0.45687,
         isFavorite = true
@@ -171,11 +186,11 @@ fun AllRatesScreenPreview() {
     val ratesList = listOf(item, item, itemFav, itemFav, item)
 
     RateTrackerAppTheme {
-        AllRatesScreen(
-            state = RateTrackerState(ratesList = ratesList),
-            selectFavorite = {},
-            changeBaseCurrency = {}
-        )
+//        AllRatesScreen(
+//            state = RateTrackerState(ratesList = ratesList),
+//            selectFavorite = {},
+//            changeBaseCurrency = {}
+//        )
     }
 }
 
@@ -183,10 +198,10 @@ fun AllRatesScreenPreview() {
 @Composable
 fun AllRatesScreenEmptyPreview() {
     RateTrackerAppTheme {
-        AllRatesScreen(
-            state = RateTrackerState(),
-            selectFavorite = {},
-            changeBaseCurrency = {}
-        )
+//        AllRatesScreen(
+//            state = RateTrackerState(),
+//            selectFavorite = {},
+//            changeBaseCurrency = {}
+//        )
     }
 }
