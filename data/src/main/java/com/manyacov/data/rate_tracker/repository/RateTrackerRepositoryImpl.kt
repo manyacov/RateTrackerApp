@@ -17,10 +17,10 @@ import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.random.Random
-
 
 class RateTrackerRepositoryImpl @Inject constructor(
     private val rateTrackerApi: RateTrackerApi,
@@ -53,38 +53,34 @@ class RateTrackerRepositoryImpl @Inject constructor(
         withSync: Boolean
     ): Flow<CustomResult<List<CurrencyRateValue>>?> {
 
-        //safeCall {
-        if (withSync) {
-            //val result = mockRemote
+        return flow {
+           safeCall {
+                if (withSync) {
+                    val result = rateTrackerApi.getLatestRates(base)
 
-            val result = rateTrackerApi.getLatestRates(base)
+                    val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
 
-            val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
+                    val entities = result.rates.map { rate ->
+                        rate.toEntityRateModel(
+                            isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
+                            date = result.date
+                        )
+                    }
 
-            val entities = result.rates.map { rate ->
-                rate.toEntityRateModel(
-                    isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
-                    date = result.date
-                )
+                    localSource.rateTrackerDao.clearRatesTable()
+                    localSource.rateTrackerDao.saveRatesList(entities)
+                }
+
+                val db = localSource.rateTrackerDao
+                when (filterType) {
+                    "CODE_Z_A" -> db.getRateListSortedBySymbolsDesc()
+                    "QUOTE_ASC" -> db.getRateListSortedByQuoteAsc()
+                    "QUOTE_DESC" -> db.getRateListSortedByQuoteDesc()
+                    else -> db.getRateListSortedBySymbolsAsc()
+                }.map { rateEntities ->
+                    rateEntities.map { entity -> entity.toDomainModels() }
+                }
             }
-            localSource.rateTrackerDao.clearRatesTable()
-            localSource.rateTrackerDao.saveRatesList(entities)
-        }
-
-        val db = localSource.rateTrackerDao
-
-        return when (filterType) {
-            "CODE_Z_A" -> db.getRateListSortedBySymbolsDesc()
-            "QUOTE_ASC" -> db.getRateListSortedByQuoteAsc()
-            "QUOTE_DESC" -> db.getRateListSortedByQuoteDesc()
-            else -> db.getRateListSortedBySymbolsAsc()
-        }.map { rateEntities ->
-            val currencyRates = try {
-                rateEntities.map { entity -> entity.toDomainModels() }
-            } catch (e: Exception) {
-                throw e
-            }
-            CustomResult.Success(currencyRates)
         }
     }
 

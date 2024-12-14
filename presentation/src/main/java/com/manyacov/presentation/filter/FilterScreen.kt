@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -35,12 +36,11 @@ fun FilterScreen(
     navController: NavHostController? = null,
     viewModel: AllRatesViewModel
 ) {
-
-    val filterState = viewModel.state
+    val filterState = viewModel.state.collectAsState()
 
     FilterScreen(
         modifier = modifier,
-        filterState = filterState,
+        filterState = filterState.value,
         navController = navController,
         updateFilterOption = { filterOption ->
             viewModel.updateFilterOption(filterOption)

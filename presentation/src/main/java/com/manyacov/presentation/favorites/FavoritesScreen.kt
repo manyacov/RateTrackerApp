@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.EmptyDescription
+import com.manyacov.presentation.ui_parts.ErrorBox
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
@@ -87,27 +88,26 @@ fun FavoritesScreen(
 
         Loader(state.isLoading)
 
-        EmptyDescription(
-            isEmpty = state.listFavorites?.isEmpty() == true && !state.isLoading,
-            stringResource(R.string.favorites_empty)
-        )
+        if (state.error != null) {
+            ErrorBox(description = stringResource(id = state.error.handleError()))
+        } else {
+            EmptyDescription(
+                isEmpty = state.listFavorites?.isEmpty() == true && !state.isLoading,
+                description = stringResource(R.string.favorites_empty)
+            )
 
-        EmptyDescription(
-            isEmpty = state.error != null,
-            description = stringResource(id = state.error.handleError())
-        )
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
-        ) {
-            items(state.listFavorites ?: listOf()) { item ->
-                FavoritesPriceItem(
-                    item = item,
-                    onClick = { base, symbols ->
-                        removeFavoritePair(base, symbols)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
+            ) {
+                items(state.listFavorites ?: listOf()) { item ->
+                    FavoritesPriceItem(
+                        item = item,
+                        onClick = { base, symbols ->
+                            removeFavoritePair(base, symbols)
+                        }
+                    )
+                }
             }
         }
 

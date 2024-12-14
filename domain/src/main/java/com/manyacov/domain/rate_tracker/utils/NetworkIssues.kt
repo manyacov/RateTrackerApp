@@ -6,4 +6,5 @@ enum class NetworkIssues {
     SERVER_ERROR,
     SERIALIZATION_ERROR,
     UNKNOWN_ERROR,
+    EXPIRED_API_KEY_ERROR
 }

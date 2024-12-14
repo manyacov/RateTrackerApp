@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +36,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.manyacov.ui.theme.Outline
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.presentation.ui_parts.EmptyDescription
+import com.manyacov.presentation.ui_parts.ErrorBox
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
 import com.manyacov.presentation.utils.handleError
@@ -49,19 +49,15 @@ fun AllRatesScreen(
     navController: NavHostController? = null,
     viewModel: AllRatesViewModel,
 ) {
-    val state = viewModel.state
-    val newState = viewModel.newState.collectAsState()
-
+    val state = viewModel.state.collectAsState()
     val listState = rememberLazyListState()
-
 
     LaunchedEffect(Unit) {
         viewModel.getCurrencySymbols()
     }
 
     AllRatesScreen(
-        state = state,
-        newState,
+        state = state.value,
         modifier = modifier,
         navController = navController,
         selectFavorite = { symbols ->
@@ -77,7 +73,6 @@ fun AllRatesScreen(
 @Composable
 fun AllRatesScreen(
     state: RateTrackerState,
-    newState: State<List<CurrencyRateValue>?>? = null,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
     selectFavorite: (String) -> Unit = {},
@@ -136,26 +131,25 @@ fun AllRatesScreen(
 
         Loader(state.isLoading)
 
-        EmptyDescription(
-            isEmpty = state.ratesList.isEmpty(),
-            stringResource(R.string.all_rates_empty)
-        )
+        if(state.error != null) {
+            ErrorBox(description = stringResource(id = state.error.handleError()))
+        } else {
+            EmptyDescription(
+                isEmpty = state.ratesList.isEmpty(),
+                description = stringResource(R.string.all_rates_empty)
+            )
 
-        EmptyDescription(
-            isEmpty = state.error != null,
-            description = stringResource(id = state.error.handleError())
-        )
-
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
-        ) {
-            items(newState?.value ?: listOf(), key = { it.id }) { item ->
-                CurrencyPriceItem(
-                    item = item,
-                    onClick = { symbols -> selectFavorite(symbols) }
-                )
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
+            ) {
+                items(state.ratesList, key = { it.id }) { item ->
+                    CurrencyPriceItem(
+                        item = item,
+                        onClick = { symbols -> selectFavorite(symbols) }
+                    )
+                }
             }
         }
 
@@ -186,11 +180,12 @@ fun AllRatesScreenPreview() {
     val ratesList = listOf(item, item, itemFav, itemFav, item)
 
     RateTrackerAppTheme {
-//        AllRatesScreen(
-//            state = RateTrackerState(ratesList = ratesList),
-//            selectFavorite = {},
-//            changeBaseCurrency = {}
-//        )
+        AllRatesScreen(
+            state = RateTrackerState(ratesList = ratesList),
+            selectFavorite = {},
+            changeBaseCurrency = {},
+            listState = LazyListState()
+        )
     }
 }
 
@@ -198,10 +193,11 @@ fun AllRatesScreenPreview() {
 @Composable
 fun AllRatesScreenEmptyPreview() {
     RateTrackerAppTheme {
-//        AllRatesScreen(
-//            state = RateTrackerState(),
-//            selectFavorite = {},
-//            changeBaseCurrency = {}
-//        )
+        AllRatesScreen(
+            state = RateTrackerState(),
+            selectFavorite = {},
+            changeBaseCurrency = {},
+            listState = LazyListState()
+        )
     }
 }
