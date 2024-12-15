@@ -94,9 +94,7 @@ class AllRatesViewModel @Inject constructor(
         when (val result =
             repository.changeFavoriteStatus(state.value.baseSymbols?.symbols ?: "", symbols)) {
 
-            is CustomResult.Success -> {
-                getLatestRates(false)
-            }
+            is CustomResult.Success -> {}
 
             is CustomResult.Error -> {
                 _state.update {

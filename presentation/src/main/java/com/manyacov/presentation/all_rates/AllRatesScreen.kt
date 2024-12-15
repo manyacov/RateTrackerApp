@@ -50,7 +50,6 @@ fun AllRatesScreen(
     viewModel: AllRatesViewModel,
 ) {
     val state = viewModel.state.collectAsState()
-    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.getCurrencySymbols()
@@ -66,7 +65,6 @@ fun AllRatesScreen(
         changeBaseCurrency = { base ->
             viewModel.updateSelectedSymbols(base)
         },
-        listState = listState,
         reloadRates = { viewModel.reloadRates() }
     )
 }
@@ -78,7 +76,6 @@ fun AllRatesScreen(
     navController: NavHostController? = null,
     selectFavorite: (String) -> Unit = {},
     changeBaseCurrency: (CurrencySymbols) -> Unit = {},
-    listState: LazyListState,
     reloadRates: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -146,10 +143,10 @@ fun AllRatesScreen(
             )
 
             LazyColumn(
-                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
             ) {
+
                 items(state.ratesList, key = { it.id }) { item ->
                     CurrencyPriceItem(
                         item = item,
@@ -190,7 +187,6 @@ fun AllRatesScreenPreview() {
             state = RateTrackerState(ratesList = ratesList),
             selectFavorite = {},
             changeBaseCurrency = {},
-            listState = LazyListState()
         )
     }
 }
@@ -202,8 +198,7 @@ fun AllRatesScreenEmptyPreview() {
         AllRatesScreen(
             state = RateTrackerState(),
             selectFavorite = {},
-            changeBaseCurrency = {},
-            listState = LazyListState()
+            changeBaseCurrency = {}
         )
     }
 }

@@ -3,7 +3,6 @@ package com.manyacov.data.rate_tracker.repository
 import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
-import com.manyacov.data.rate_tracker.datasource.remote.model.RatesDto
 import com.manyacov.data.rate_tracker.mapper.toDomainModel
 import com.manyacov.data.rate_tracker.mapper.toEntityModels
 import com.manyacov.data.rate_tracker.mapper.toDomainModels
@@ -18,7 +17,6 @@ import com.manyacov.domain.rate_tracker.utils.CustomResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-import kotlin.random.Random
 
 class RateTrackerRepositoryImpl @Inject constructor(
     private val rateTrackerApi: RateTrackerApi,
@@ -47,6 +45,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
                         emit(CustomResult.Success(domainModels))
                     }
                 }
+
                 is CustomResult.Error -> {
                     emit(CustomResult.Error(issueType = safeResult.issueType))
                 }
@@ -62,8 +61,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
         return flow {
             val safeResult = safeCall {
                 if (withSync) {
-                    val result = mockRemoteRates()
-                    //val result = rateTrackerApi.getLatestRates(base)
+                    val result = rateTrackerApi.getLatestRates(base)
 
                     val favoritesList =
                         localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
@@ -96,40 +94,11 @@ class RateTrackerRepositoryImpl @Inject constructor(
                         emit(CustomResult.Success(domainModels))
                     }
                 }
+
                 is CustomResult.Error -> {
                     emit(CustomResult.Error(issueType = safeResult.issueType))
                 }
             }
-        }
-    }
-
-    //TODO: remove
-    private fun mockRemoteRates(): RatesDto {
-        val currencies = generateRandomStrings(200, 3)
-        val random = Random(System.currentTimeMillis())
-
-        val rates = mutableMapOf<String, Double>()
-        currencies.forEach {
-            rates[it] = random.nextDouble(1.0, 100.0)
-        }
-
-        return RatesDto(
-            base = "AED",
-            date = "2024-12-01",
-            rates = rates,
-            success = true,
-            timestamp = System.currentTimeMillis()
-        )
-    }
-
-    fun generateRandomStrings(count: Int, length: Int): List<String> {
-        val chars = ('A'..'Z').toList()
-        val random = Random(System.currentTimeMillis())
-
-        return List(count) {
-            (1..length)
-                .map { chars[random.nextInt(chars.size)] }
-                .joinToString("")
         }
     }
 
