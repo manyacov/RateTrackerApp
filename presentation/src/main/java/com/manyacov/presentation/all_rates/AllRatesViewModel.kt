@@ -37,25 +37,24 @@ class AllRatesViewModel @Inject constructor(
     }
 
     fun getCurrencySymbols() = viewModelScope.launch(Dispatchers.IO) {
-        when (val result = repository.getCurrencySymbols()) {
-            is CustomResult.Success -> {
-                val base = state.value.baseSymbols
-                _state.update {
-                    state.value.copy(
-                        symbols = result.data ?: emptyList(),
-                        baseSymbols = base ?: result.data?.get(0),
-                        error = null
-                    )
+        repository.getCurrencySymbols().collect { result ->
+            when (result) {
+                is CustomResult.Success -> {
+                    val base = state.value.baseSymbols
+                    _state.update {
+                        state.value.copy(
+                            symbols = result.data ?: emptyList(),
+                            baseSymbols = base ?: result.data?.get(0),
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                    getLatestRates(base == null)
                 }
-                getLatestRates(base == null)
-            }
-
-            is CustomResult.Error -> {
-                _state.update {
-                    state.value.copy(
-                        isLoading = false,
-                        error = result.issueType
-                    )
+                else -> {
+                    _state.update {
+                        state.value.copy(isLoading = false, error = result.issueType)
+                    }
                 }
             }
         }
@@ -77,13 +76,6 @@ class AllRatesViewModel @Inject constructor(
                         )
                     }
                 }
-
-                is CustomResult.Error -> {
-                    _state.update {
-                        state.value.copy(isLoading = false, error = result.issueType)
-                    }
-                }
-
                 else -> {
                     _state.update {
                         state.value.copy(isLoading = false, error = result?.issueType)

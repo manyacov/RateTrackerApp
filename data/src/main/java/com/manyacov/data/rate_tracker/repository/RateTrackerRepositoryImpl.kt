@@ -2,7 +2,6 @@ package com.manyacov.data.rate_tracker.repository
 
 import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
-import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
 import com.manyacov.data.rate_tracker.datasource.remote.model.RatesDto
 import com.manyacov.data.rate_tracker.mapper.toDomainModel
@@ -18,7 +17,6 @@ import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -27,24 +25,33 @@ class RateTrackerRepositoryImpl @Inject constructor(
     private val localSource: RateTrackerDatabase
 ) : RateTrackerRepository {
 
-    override suspend fun getCurrencySymbols(): CustomResult<List<CurrencySymbols>?> {
-        return safeCall {
+    override suspend fun getCurrencySymbols(): Flow<CustomResult<List<CurrencySymbols>?>> {
+        return flow {
+            val safeResult = safeCall {
+                val checkElement = localSource.rateTrackerDao.getFirstElement()
+                if (checkElement != null && isLessThanOneMonthAgo(checkElement.lastUpdate)) {
+                    localSource.rateTrackerDao.getCurrencySymbolsList()
+                } else {
+                    val result = rateTrackerApi.getCurrencySymbols()
 
-            val cached = getCashedSymbols()
-            if (cached.isNotEmpty() && isLessThanOneMonthAgo(cached[0].lastUpdate)) {
-                cached.map { it.toDomainModel() }
-            } else {
-                val result = rateTrackerApi.getCurrencySymbols()
+                    val entities = result.toEntityModels()
+                    localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
+                    localSource.rateTrackerDao.getCurrencySymbolsList()
+                }
+            }
 
-                val entities = result.toEntityModels()
-                localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
-                getCashedSymbols().map { it.toDomainModel() }
+            when (safeResult) {
+                is CustomResult.Success -> {
+                    safeResult.data?.collect { symbols ->
+                        val domainModels = symbols.map { entity -> entity.toDomainModel() }
+                        emit(CustomResult.Success(domainModels))
+                    }
+                }
+                is CustomResult.Error -> {
+                    emit(CustomResult.Error(issueType = safeResult.issueType))
+                }
             }
         }
-    }
-
-    private suspend fun getCashedSymbols(): List<SymbolsEntity> {
-        return localSource.rateTrackerDao.getCurrencySymbolsList()
     }
 
     override suspend fun loadLatestRates(
@@ -52,13 +59,14 @@ class RateTrackerRepositoryImpl @Inject constructor(
         filterType: String?,
         withSync: Boolean
     ): Flow<CustomResult<List<CurrencyRateValue>>?> {
-
         return flow {
-           safeCall {
+            val safeResult = safeCall {
                 if (withSync) {
-                    val result = rateTrackerApi.getLatestRates(base)
+                    val result = mockRemoteRates()
+                    //val result = rateTrackerApi.getLatestRates(base)
 
-                    val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
+                    val favoritesList =
+                        localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
 
                     val entities = result.rates.map { rate ->
                         rate.toEntityRateModel(
@@ -77,13 +85,23 @@ class RateTrackerRepositoryImpl @Inject constructor(
                     "QUOTE_ASC" -> db.getRateListSortedByQuoteAsc()
                     "QUOTE_DESC" -> db.getRateListSortedByQuoteDesc()
                     else -> db.getRateListSortedBySymbolsAsc()
-                }.map { rateEntities ->
-                    rateEntities.map { entity -> entity.toDomainModels() }
+                }
+            }
+
+            when (safeResult) {
+                is CustomResult.Success -> {
+                    safeResult.data?.collect { rateEntities ->
+                        val domainModels =
+                            rateEntities.map { entity -> entity.toDomainModels() }
+                        emit(CustomResult.Success(domainModels))
+                    }
+                }
+                is CustomResult.Error -> {
+                    emit(CustomResult.Error(issueType = safeResult.issueType))
                 }
             }
         }
     }
-
 
     //TODO: remove
     private fun mockRemoteRates(): RatesDto {

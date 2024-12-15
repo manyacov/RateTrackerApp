@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RateTrackerRepository {
 
-    suspend fun getCurrencySymbols(): CustomResult<List<CurrencySymbols>?>
+    suspend fun getCurrencySymbols(): Flow<CustomResult<List<CurrencySymbols>?>>
 
     suspend fun loadLatestRates(base: String, filterType: String?, withSync: Boolean): Flow<CustomResult<List<CurrencyRateValue>>?>
 

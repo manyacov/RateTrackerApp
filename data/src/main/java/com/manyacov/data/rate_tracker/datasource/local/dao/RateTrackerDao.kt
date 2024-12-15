@@ -19,11 +19,13 @@ interface RateTrackerDao {
     suspend fun saveCurrencySymbolsList(list: List<SymbolsEntity>)
 
     @Query("SELECT * FROM symbols_table")
-    suspend fun getCurrencySymbolsList(): List<SymbolsEntity>
+    fun getCurrencySymbolsList(): Flow<List<SymbolsEntity>>
+
+    @Query("SELECT * FROM symbols_table LIMIT 1")
+    fun getFirstElement(): SymbolsEntity?
 
     /**
      * All rates list.
-     * Used mostly for pagination purposes.
      */
     @Insert
     suspend fun saveRatesList(list: List<RateEntity>)
