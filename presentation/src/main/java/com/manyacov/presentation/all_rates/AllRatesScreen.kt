@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +36,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.manyacov.ui.theme.Outline
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.presentation.ui_parts.EmptyDescription
+import com.manyacov.presentation.ui_parts.ErrorBox
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
 import com.manyacov.presentation.utils.handleError
@@ -45,14 +49,14 @@ fun AllRatesScreen(
     navController: NavHostController? = null,
     viewModel: AllRatesViewModel,
 ) {
-    val state = viewModel.state
+    val state = viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getCurrencySymbols()
     }
 
     AllRatesScreen(
-        state = state,
+        state = state.value,
         modifier = modifier,
         navController = navController,
         selectFavorite = { symbols ->
@@ -60,7 +64,8 @@ fun AllRatesScreen(
         },
         changeBaseCurrency = { base ->
             viewModel.updateSelectedSymbols(base)
-        }
+        },
+        reloadRates = { viewModel.reloadRates() }
     )
 }
 
@@ -70,7 +75,8 @@ fun AllRatesScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
     selectFavorite: (String) -> Unit = {},
-    changeBaseCurrency: (CurrencySymbols) -> Unit = {}
+    changeBaseCurrency: (CurrencySymbols) -> Unit = {},
+    reloadRates: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -124,25 +130,29 @@ fun AllRatesScreen(
 
         Loader(state.isLoading)
 
-        EmptyDescription(
-            isEmpty = state.ratesList.isEmpty(),
-            stringResource(R.string.all_rates_empty)
-        )
+        if(state.error != null) {
+            ErrorBox(
+                description = stringResource(id = state.error.handleError()),
+                reload = reloadRates
+            )
+        } else {
+            EmptyDescription(
+                isEmpty = state.ratesList.isEmpty(),
+                description = stringResource(R.string.all_rates_empty),
+                reload = reloadRates
+            )
 
-        EmptyDescription(
-            isEmpty = state.error != null,
-            description = stringResource(id = state.error.handleError())
-        )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
+            ) {
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
-        ) {
-            items(state.ratesList) { item ->
-                CurrencyPriceItem(
-                    item = item,
-                    onClick = { symbols -> selectFavorite(symbols) }
-                )
+                items(state.ratesList, key = { it.id }) { item ->
+                    CurrencyPriceItem(
+                        item = item,
+                        onClick = { symbols -> selectFavorite(symbols) }
+                    )
+                }
             }
         }
 
@@ -159,11 +169,13 @@ fun AllRatesScreen(
 @Composable
 fun AllRatesScreenPreview() {
     val item = CurrencyRateValue(
+        id = 0,
         symbols = "USD",
         value = 0.45687,
         isFavorite = false
     )
     val itemFav = CurrencyRateValue(
+        id = 1,
         symbols = "USD",
         value = 0.45687,
         isFavorite = true
@@ -174,7 +186,7 @@ fun AllRatesScreenPreview() {
         AllRatesScreen(
             state = RateTrackerState(ratesList = ratesList),
             selectFavorite = {},
-            changeBaseCurrency = {}
+            changeBaseCurrency = {},
         )
     }
 }

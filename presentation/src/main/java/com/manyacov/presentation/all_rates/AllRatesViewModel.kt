@@ -1,9 +1,5 @@
 package com.manyacov.presentation.all_rates
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
@@ -12,6 +8,10 @@ import com.manyacov.domain.rate_tracker.utils.CustomResult
 import com.manyacov.presentation.filter.SortOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,84 +20,86 @@ class AllRatesViewModel @Inject constructor(
     private val repository: RateTrackerRepository
 ) : ViewModel() {
 
-    var state by mutableStateOf(RateTrackerState(isLoading = true))
-        private set
+    private val _state = MutableStateFlow(RateTrackerState(isLoading = true))
+    val state: StateFlow<RateTrackerState> = _state.asStateFlow()
 
     fun updateFilterOption(option: SortOptions) {
-        state = state.copy(filterOption = option)
+        _state.update {
+            state.value.copy(filterOption = option)
+        }
     }
 
-    fun updateSelectedSymbols(symbols: CurrencySymbols) {
-        state = state.copy(baseSymbols = symbols)
+    fun updateSelectedSymbols(symbols: CurrencySymbols) = viewModelScope.launch(Dispatchers.IO) {
+        _state.update {
+            state.value.copy(baseSymbols = symbols)
+        }
         getLatestRates(true)
     }
 
     fun getCurrencySymbols() = viewModelScope.launch(Dispatchers.IO) {
-        when (val result = repository.getCurrencySymbols()) {
-            is CustomResult.Success -> {
-                Log.println(Log.ERROR, "SSSS", result.data.toString())
-                val base = state.baseSymbols
-                state = state.copy(
-                    symbols = result.data ?: listOf(CurrencySymbols("")),
-                    baseSymbols = base ?: result.data?.get(0),
-                    error = null
-                )
-                getLatestRates(base == null)
-            }
-
-            is CustomResult.Error -> {
-                Log.println(Log.ERROR, "SSSS_n", "")
-
-                state = state.copy(
-                    symbols = listOf(CurrencySymbols("")),
-                    isLoading = false,
-                    error = result.issueType
-                )
+        repository.getCurrencySymbols().collect { result ->
+            when (result) {
+                is CustomResult.Success -> {
+                    val base = state.value.baseSymbols
+                    _state.update {
+                        state.value.copy(
+                            symbols = result.data ?: emptyList(),
+                            baseSymbols = base ?: result.data?.get(0),
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                    getLatestRates(base == null)
+                }
+                else -> {
+                    _state.update {
+                        state.value.copy(isLoading = false, error = result.issueType)
+                    }
+                }
             }
         }
     }
 
-    private fun getLatestRates(withSync: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-            state = state.copy(isLoading = true)
+    fun reloadRates(withSync: Boolean = true) = viewModelScope.launch(Dispatchers.IO) {
+        getLatestRates(withSync)
+    }
 
-            Log.println(Log.ERROR, "KKKKKK", withSync.toString())
-
-            when (val result = repository.loadLatestRates(state.baseSymbols?.symbols ?: "", state.filterOption.toString(), withSync)) {
+    private suspend fun getLatestRates(withSync: Boolean) {
+        _state.update { state.value.copy(isLoading = true) }
+        repository.loadLatestRates(
+            state.value.baseSymbols?.symbols ?: "",
+            state.value.filterOption.toString(),
+            withSync
+        ).collect { result ->
+            when (result) {
                 is CustomResult.Success -> {
-                    Log.println(Log.ERROR, "SSSS", result.data.toString())
-
-                    state = state.copy(
-                        ratesList = result.data ?: emptyList(),
-                        isLoading = false
-                    )
+                    _state.update {
+                        state.value.copy(
+                            ratesList = result.data ?: emptyList(),
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }
-
-                is CustomResult.Error -> {
-                    Log.println(Log.ERROR, "SSSS_n", "")
-
-                    state = state.copy(
-                        isLoading = false,
-                        error = result.issueType
-                    )
+                else -> {
+                    _state.update {
+                        state.value.copy(isLoading = false, error = result?.issueType)
+                    }
                 }
             }
         }
+    }
 
     fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
-        when (val result = repository.changeFavoriteStatus(state.baseSymbols?.symbols ?: "", symbols)) {
-            is CustomResult.Success -> {
-                Log.println(Log.ERROR, "SSSS", "selectFavorite")
+        when (val result =
+            repository.changeFavoriteStatus(state.value.baseSymbols?.symbols ?: "", symbols)) {
 
-                getLatestRates(false)
-            }
+            is CustomResult.Success -> {}
 
             is CustomResult.Error -> {
-                Log.println(Log.ERROR, "SSSS_n", "")
-
-                state = state.copy(
-                    isLoading = false,
-                    error = result.issueType
-                )
+                _state.update {
+                    state.value.copy(isLoading = false, error = result.issueType)
+                }
             }
         }
     }

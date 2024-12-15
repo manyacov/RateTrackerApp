@@ -82,6 +82,7 @@ fun CurrencyPriceItem(
 @Composable
 fun CurrencyPriceItemFavoritePreview() {
     val item = CurrencyRateValue (
+        id = 0,
         symbols = "USD",
         value = 0.45687,
         isFavorite = true
@@ -95,6 +96,7 @@ fun CurrencyPriceItemFavoritePreview() {
 @Composable
 fun CurrencyPriceItemNotFavoritePreview() {
     val item = CurrencyRateValue (
+        id = 0,
         symbols = "USD",
         value = 0.45687,
         isFavorite = false

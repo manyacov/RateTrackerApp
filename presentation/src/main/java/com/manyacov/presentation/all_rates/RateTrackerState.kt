@@ -8,7 +8,7 @@ import com.manyacov.presentation.filter.SortOptions
 
 @Immutable
 data class RateTrackerState(
-    val symbols: List<CurrencySymbols> = listOf(CurrencySymbols("")),
+    val symbols: List<CurrencySymbols> = emptyList(),
     val baseSymbols: CurrencySymbols? = null,
     val filterOption: SortOptions = SortOptions.CODE_A_Z,
     val ratesList: List<CurrencyRateValue> = emptyList(),

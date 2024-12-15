@@ -2,7 +2,6 @@ package com.manyacov.data.rate_tracker.repository
 
 import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.local.model.FavoritePairEntity
-import com.manyacov.data.rate_tracker.datasource.local.model.SymbolsEntity
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
 import com.manyacov.data.rate_tracker.mapper.toDomainModel
 import com.manyacov.data.rate_tracker.mapper.toEntityModels
@@ -15,6 +14,8 @@ import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class RateTrackerRepositoryImpl @Inject constructor(
@@ -22,56 +23,84 @@ class RateTrackerRepositoryImpl @Inject constructor(
     private val localSource: RateTrackerDatabase
 ) : RateTrackerRepository {
 
-    override suspend fun getCurrencySymbols(): CustomResult<List<CurrencySymbols>?> {
-        return safeCall {
+    override suspend fun getCurrencySymbols(): Flow<CustomResult<List<CurrencySymbols>?>> {
+        return flow {
+            val safeResult = safeCall {
+                val checkElement = localSource.rateTrackerDao.getFirstElement()
+                if (checkElement != null && isLessThanOneMonthAgo(checkElement.lastUpdate)) {
+                    localSource.rateTrackerDao.getCurrencySymbolsList()
+                } else {
+                    val result = rateTrackerApi.getCurrencySymbols()
 
-            val cached = getCashedSymbols()
-            if (cached.isNotEmpty() && isLessThanOneMonthAgo(cached[0].lastUpdate)) {
-                cached.map { it.toDomainModel() }
-            } else {
-                val result = rateTrackerApi.getCurrencySymbols()
+                    val entities = result.toEntityModels()
+                    localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
+                    localSource.rateTrackerDao.getCurrencySymbolsList()
+                }
+            }
 
-                val entities = result.toEntityModels()
-                localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
-                getCashedSymbols().map { it.toDomainModel() }
+            when (safeResult) {
+                is CustomResult.Success -> {
+                    safeResult.data?.collect { symbols ->
+                        val domainModels = symbols.map { entity -> entity.toDomainModel() }
+                        emit(CustomResult.Success(domainModels))
+                    }
+                }
+
+                is CustomResult.Error -> {
+                    emit(CustomResult.Error(issueType = safeResult.issueType))
+                }
             }
         }
-    }
-
-    private suspend fun getCashedSymbols(): List<SymbolsEntity> {
-        return localSource.rateTrackerDao.getCurrencySymbolsList()
     }
 
     override suspend fun loadLatestRates(
         base: String,
         filterType: String?,
         withSync: Boolean
-    ): CustomResult<List<CurrencyRateValue>?> {
-        return safeCall {
-            if (withSync) {
-                val result = rateTrackerApi.getLatestRates(base)
+    ): Flow<CustomResult<List<CurrencyRateValue>>?> {
+        return flow {
+            val safeResult = safeCall {
+                if (withSync) {
+                    val result = rateTrackerApi.getLatestRates(base)
 
-                val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
+                    val favoritesList =
+                        localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
 
-                val entities = result.rates.map { rate ->
-                    rate.toEntityRateModel(
-                        isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
-                        date = result.date
-                    )
+                    val entities = result.rates.map { rate ->
+                        rate.toEntityRateModel(
+                            isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
+                            date = result.date
+                        )
+                    }
+
+                    localSource.rateTrackerDao.clearRatesTable()
+                    localSource.rateTrackerDao.saveRatesList(entities)
                 }
-                localSource.rateTrackerDao.clearRatesTable()
-                localSource.rateTrackerDao.saveRatesList(entities)
+
+                val db = localSource.rateTrackerDao
+                when (filterType) {
+                    "CODE_Z_A" -> db.getRateListSortedBySymbolsDesc()
+                    "QUOTE_ASC" -> db.getRateListSortedByQuoteAsc()
+                    "QUOTE_DESC" -> db.getRateListSortedByQuoteDesc()
+                    else -> db.getRateListSortedBySymbolsAsc()
+                }
             }
 
-            when(filterType) {
-                "CODE_Z_A" -> localSource.rateTrackerDao.getRateListSortedBySymbolsDesc()
-                "QUOTE_ASC" -> localSource.rateTrackerDao.getRateListSortedByQuoteAsc()
-                "QUOTE_DESC" -> localSource.rateTrackerDao.getRateListSortedByQuoteDesc()
-                else -> localSource.rateTrackerDao.getRateListSortedBySymbolsAsc()
-            }.map { it.toDomainModels() }
+            when (safeResult) {
+                is CustomResult.Success -> {
+                    safeResult.data?.collect { rateEntities ->
+                        val domainModels =
+                            rateEntities.map { entity -> entity.toDomainModels() }
+                        emit(CustomResult.Success(domainModels))
+                    }
+                }
+
+                is CustomResult.Error -> {
+                    emit(CustomResult.Error(issueType = safeResult.issueType))
+                }
+            }
         }
     }
-
 
     override suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?> {
         return safeCall {

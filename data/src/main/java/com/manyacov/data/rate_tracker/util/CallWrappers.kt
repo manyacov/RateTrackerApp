@@ -22,6 +22,7 @@ fun handleNetworkError(exception: Exception): NetworkIssues {
         is UnknownHostException -> NetworkIssues.NO_INTERNET_ERROR
         is HttpException -> {
             when (exception.code()) {
+                429 -> NetworkIssues.EXPIRED_API_KEY_ERROR
                 in 500..599 -> NetworkIssues.SERVER_ERROR
                 else -> NetworkIssues.UNKNOWN_ERROR
             }

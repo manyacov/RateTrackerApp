@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,32 +18,30 @@ import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
 import com.manyacov.ui.R
 
 @Composable
-fun EmptyDescription(
+fun ErrorBox(
     modifier: Modifier = Modifier,
-    isEmpty: Boolean,
     description: String,
     reload: () -> Unit = {}
 ) {
-    if (isEmpty) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .clickable { reload() }
-                .wrapContentSize(Alignment.Center)
-                .padding(dimensionResource(R.dimen.space_size_16))
-        ) {
-            Text(
-                text = description,
-                fontWeight = FontWeight.Normal,
-                fontSize = fontDimensionResource(id = R.dimen.text_size_14),
-                textAlign = TextAlign.Center
-            )
-        }
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { reload() }
+            .wrapContentSize(Alignment.Center)
+            .padding(dimensionResource(R.dimen.space_size_16))
+    ) {
+        Text(
+            text = description,
+            color = MaterialTheme.colorScheme.error,
+            fontWeight = FontWeight.Normal,
+            fontSize = fontDimensionResource(id = R.dimen.text_size_14),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
 @Preview
 @Composable
-fun EmptyDescriptionPreview() {
-    EmptyDescription(isEmpty = true, description = "Nothing is here")
+fun ErrorBoxPreview() {
+    ErrorBox(description = "Houston, we've had a problem")
 }

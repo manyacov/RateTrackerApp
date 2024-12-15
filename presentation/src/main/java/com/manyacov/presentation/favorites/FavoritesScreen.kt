@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.EmptyDescription
+import com.manyacov.presentation.ui_parts.ErrorBox
 import com.manyacov.presentation.ui_parts.FavoritesPriceItem
 import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
@@ -37,18 +39,19 @@ fun FavoritesScreen(
     modifier: Modifier = Modifier,
     viewModel: FavoritesViewModel
 ) {
-    val state = viewModel.state
+    val state = viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getFavoritesList()
     }
 
     FavoritesScreen(
-        state = state,
+        state = state.value,
         modifier = modifier,
         removeFavoritePair = { base, symbols ->
             viewModel.removeFavoritePair(base, symbols)
-        }
+        },
+        reloadFavorites = { viewModel.getFavoritesList() }
     )
 }
 
@@ -56,7 +59,8 @@ fun FavoritesScreen(
 fun FavoritesScreen(
     state: FavoritesTrackerState,
     modifier: Modifier = Modifier,
-    removeFavoritePair: (String, String) -> Unit = { _, _ -> }
+    removeFavoritePair: (String, String) -> Unit = { _, _ -> },
+    reloadFavorites: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -87,27 +91,30 @@ fun FavoritesScreen(
 
         Loader(state.isLoading)
 
-        EmptyDescription(
-            isEmpty = state.listFavorites?.isEmpty() == true && !state.isLoading,
-            stringResource(R.string.favorites_empty)
-        )
+        if (state.error != null) {
+            ErrorBox(
+                description = stringResource(id = state.error.handleError()),
+                reload = reloadFavorites
+            )
+        } else {
+            EmptyDescription(
+                isEmpty = state.listFavorites.isEmpty() && !state.isLoading,
+                description = stringResource(R.string.favorites_empty),
+                reload = reloadFavorites
+            )
 
-        EmptyDescription(
-            isEmpty = state.error != null,
-            description = stringResource(id = state.error.handleError())
-        )
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
-        ) {
-            items(state.listFavorites ?: listOf()) { item ->
-                FavoritesPriceItem(
-                    item = item,
-                    onClick = { base, symbols ->
-                        removeFavoritePair(base, symbols)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
+            ) {
+                items(state.listFavorites) { item ->
+                    FavoritesPriceItem(
+                        item = item,
+                        onClick = { base, symbols ->
+                            removeFavoritePair(base, symbols)
+                        }
+                    )
+                }
             }
         }
 
