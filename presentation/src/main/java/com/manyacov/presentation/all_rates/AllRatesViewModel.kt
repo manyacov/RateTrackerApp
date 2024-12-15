@@ -60,7 +60,12 @@ class AllRatesViewModel @Inject constructor(
         }
     }
 
+    fun reloadRates(withSync: Boolean = true) = viewModelScope.launch(Dispatchers.IO) {
+        getLatestRates(withSync)
+    }
+
     private suspend fun getLatestRates(withSync: Boolean) {
+        _state.update { state.value.copy(isLoading = true) }
         repository.loadLatestRates(
             state.value.baseSymbols?.symbols ?: "",
             state.value.filterOption.toString(),

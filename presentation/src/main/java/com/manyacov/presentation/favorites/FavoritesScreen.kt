@@ -50,7 +50,8 @@ fun FavoritesScreen(
         modifier = modifier,
         removeFavoritePair = { base, symbols ->
             viewModel.removeFavoritePair(base, symbols)
-        }
+        },
+        reloadFavorites = { viewModel.getFavoritesList() }
     )
 }
 
@@ -58,7 +59,8 @@ fun FavoritesScreen(
 fun FavoritesScreen(
     state: FavoritesTrackerState,
     modifier: Modifier = Modifier,
-    removeFavoritePair: (String, String) -> Unit = { _, _ -> }
+    removeFavoritePair: (String, String) -> Unit = { _, _ -> },
+    reloadFavorites: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -90,11 +92,15 @@ fun FavoritesScreen(
         Loader(state.isLoading)
 
         if (state.error != null) {
-            ErrorBox(description = stringResource(id = state.error.handleError()))
+            ErrorBox(
+                description = stringResource(id = state.error.handleError()),
+                reload = reloadFavorites
+            )
         } else {
             EmptyDescription(
                 isEmpty = state.listFavorites.isEmpty() && !state.isLoading,
-                description = stringResource(R.string.favorites_empty)
+                description = stringResource(R.string.favorites_empty),
+                reload = reloadFavorites
             )
 
             LazyColumn(

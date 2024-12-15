@@ -66,7 +66,8 @@ fun AllRatesScreen(
         changeBaseCurrency = { base ->
             viewModel.updateSelectedSymbols(base)
         },
-        listState = listState
+        listState = listState,
+        reloadRates = { viewModel.reloadRates() }
     )
 }
 
@@ -77,7 +78,8 @@ fun AllRatesScreen(
     navController: NavHostController? = null,
     selectFavorite: (String) -> Unit = {},
     changeBaseCurrency: (CurrencySymbols) -> Unit = {},
-    listState: LazyListState
+    listState: LazyListState,
+    reloadRates: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -132,11 +134,15 @@ fun AllRatesScreen(
         Loader(state.isLoading)
 
         if(state.error != null) {
-            ErrorBox(description = stringResource(id = state.error.handleError()))
+            ErrorBox(
+                description = stringResource(id = state.error.handleError()),
+                reload = reloadRates
+            )
         } else {
             EmptyDescription(
                 isEmpty = state.ratesList.isEmpty(),
-                description = stringResource(R.string.all_rates_empty)
+                description = stringResource(R.string.all_rates_empty),
+                reload = reloadRates
             )
 
             LazyColumn(

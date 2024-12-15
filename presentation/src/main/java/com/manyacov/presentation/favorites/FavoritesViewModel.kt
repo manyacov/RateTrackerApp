@@ -1,6 +1,5 @@
 package com.manyacov.presentation.favorites
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
@@ -23,6 +22,7 @@ class FavoritesViewModel @Inject constructor(
     val state: StateFlow<FavoritesTrackerState> = _state.asStateFlow()
 
     fun getFavoritesList() = viewModelScope.launch(Dispatchers.IO) {
+        _state.update { state.value.copy(isLoading = true) }
         when (val result = repository.getFavoriteRates()) {
             is CustomResult.Success -> {
                 _state.update {
