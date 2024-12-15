@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,14 +39,14 @@ fun FavoritesScreen(
     modifier: Modifier = Modifier,
     viewModel: FavoritesViewModel
 ) {
-    val state = viewModel.state
+    val state = viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getFavoritesList()
     }
 
     FavoritesScreen(
-        state = state,
+        state = state.value,
         modifier = modifier,
         removeFavoritePair = { base, symbols ->
             viewModel.removeFavoritePair(base, symbols)
@@ -92,7 +93,7 @@ fun FavoritesScreen(
             ErrorBox(description = stringResource(id = state.error.handleError()))
         } else {
             EmptyDescription(
-                isEmpty = state.listFavorites?.isEmpty() == true && !state.isLoading,
+                isEmpty = state.listFavorites.isEmpty() && !state.isLoading,
                 description = stringResource(R.string.favorites_empty)
             )
 
@@ -100,7 +101,7 @@ fun FavoritesScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
             ) {
-                items(state.listFavorites ?: listOf()) { item ->
+                items(state.listFavorites) { item ->
                     FavoritesPriceItem(
                         item = item,
                         onClick = { base, symbols ->
