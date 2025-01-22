@@ -7,7 +7,12 @@ import com.manyacov.data.rate_tracker.mapper.toDomainModel
 import com.manyacov.data.rate_tracker.mapper.toEntityModels
 import com.manyacov.data.rate_tracker.mapper.toDomainModels
 import com.manyacov.data.rate_tracker.mapper.toEntityRateModel
+import com.manyacov.data.rate_tracker.util.generateSelectedRates
 import com.manyacov.data.rate_tracker.util.isLessThanOneMonthAgo
+import com.manyacov.data.rate_tracker.util.mockSymbolsDto
+import com.manyacov.data.rate_tracker.util.ratesDtoEUR
+import com.manyacov.data.rate_tracker.util.ratesDtoJPY
+import com.manyacov.data.rate_tracker.util.ratesDtoUSD
 import com.manyacov.domain.rate_tracker.repository.RateTrackerRepository
 import com.manyacov.data.rate_tracker.util.safeCall
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
@@ -30,7 +35,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
                 if (checkElement != null && isLessThanOneMonthAgo(checkElement.lastUpdate)) {
                     localSource.rateTrackerDao.getCurrencySymbolsList()
                 } else {
-                    val result = rateTrackerApi.getCurrencySymbols()
+                    val result = mockSymbolsDto//rateTrackerApi.getCurrencySymbols()
 
                     val entities = result.toEntityModels()
                     localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
@@ -55,13 +60,17 @@ class RateTrackerRepositoryImpl @Inject constructor(
 
     override suspend fun loadLatestRates(
         base: String,
-        filterType: String?,
         withSync: Boolean
     ): Flow<CustomResult<List<CurrencyRateValue>>?> {
         return flow {
             val safeResult = safeCall {
                 if (withSync) {
-                    val result = rateTrackerApi.getLatestRates(base)
+//                    val result = rateTrackerApi.getLatestRates(base)
+                    val result = when(base) {
+                        "USD" -> ratesDtoUSD
+                        "EUR" -> ratesDtoEUR
+                        else -> ratesDtoJPY
+                    }
 
                     val favoritesList =
                         localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
@@ -78,12 +87,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
                 }
 
                 val db = localSource.rateTrackerDao
-                when (filterType) {
-                    "CODE_Z_A" -> db.getRateListSortedBySymbolsDesc()
-                    "QUOTE_ASC" -> db.getRateListSortedByQuoteAsc()
-                    "QUOTE_DESC" -> db.getRateListSortedByQuoteDesc()
-                    else -> db.getRateListSortedBySymbolsAsc()
-                }
+                db.getRateList()
             }
 
             when (safeResult) {
@@ -113,7 +117,8 @@ class RateTrackerRepositoryImpl @Inject constructor(
 
             return@safeCall if (pairs.isNotEmpty()) {
                 val result = favoritePairs.map {
-                    rateTrackerApi.getLatestRatesForPair(it.key, it.value.joinToString())
+                    generateSelectedRates(it.key, it.value.joinToString())
+                    //rateTrackerApi.getLatestRatesForPair(it.key, it.value.joinToString())
                 }
 
                 result.flatMap { ratesDto ->

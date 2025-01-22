@@ -53,6 +53,8 @@ class FavoritesViewModel @Inject constructor(
             removeFavorite(baseSymbols, symbols)
         }
 
+    //TODO: add auto update
+    //TODO: remove from all rates list
     private suspend fun removeFavorite(baseSymbols: String, symbols: String) {
         when (val result = repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
             is CustomResult.Success -> {

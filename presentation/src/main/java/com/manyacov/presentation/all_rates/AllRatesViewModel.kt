@@ -1,5 +1,6 @@
 package com.manyacov.presentation.all_rates
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
@@ -68,14 +69,23 @@ class AllRatesViewModel @Inject constructor(
         _state.update { state.value.copy(isLoading = true) }
         repository.loadLatestRates(
             state.value.baseSymbols?.symbols ?: "",
-            state.value.filterOption.toString(),
             withSync
         ).collect { result ->
             when (result) {
                 is CustomResult.Success -> {
+
+                    val sortedList = when (state.value.filterOption) {
+                        SortOptions.CODE_A_Z -> result.data?.sortedBy { it.symbols }
+                        SortOptions.CODE_Z_A -> result.data?.sortedByDescending { it.symbols }
+                        SortOptions.QUOTE_ASC -> result.data?.sortedBy { it.value }
+                        SortOptions.QUOTE_DESC -> result.data?.sortedByDescending { it.value }
+                    }.apply {
+                        Log.println(Log.DEBUG, "RRRR", "filter")
+                    }
+
                     _state.update {
                         state.value.copy(
-                            ratesList = result.data ?: emptyList(),
+                            ratesList = sortedList ?: emptyList(),
                             isLoading = false,
                             error = null
                         )

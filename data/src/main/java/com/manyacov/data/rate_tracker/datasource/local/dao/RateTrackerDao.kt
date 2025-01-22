@@ -33,17 +33,8 @@ interface RateTrackerDao {
     @Query("DELETE FROM rates_table")
     suspend fun clearRatesTable()
 
-    @Query("SELECT * FROM rates_table ORDER BY symbols ASC")
-    fun getRateListSortedBySymbolsAsc(): Flow<List<RateEntity>>
-
-    @Query("SELECT * FROM rates_table ORDER BY symbols DESC")
-    fun getRateListSortedBySymbolsDesc(): Flow<List<RateEntity>>
-
-    @Query("SELECT * FROM rates_table ORDER BY value ASC")
-    fun getRateListSortedByQuoteAsc(): Flow<List<RateEntity>>
-
-    @Query("SELECT * FROM rates_table ORDER BY value DESC")
-    fun getRateListSortedByQuoteDesc(): Flow<List<RateEntity>>
+    @Query("SELECT * FROM rates_table")
+    fun getRateList(): Flow<List<RateEntity>>
 
     @Query("SELECT * FROM favorites_table WHERE base_symbols = :base")
     suspend fun getFavoriteRatesListByBase(base: String): List<FavoritePairEntity>
