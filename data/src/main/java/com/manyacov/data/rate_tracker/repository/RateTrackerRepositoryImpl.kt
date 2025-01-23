@@ -21,6 +21,7 @@ import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RateTrackerRepositoryImpl @Inject constructor(
@@ -28,6 +29,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
     private val localSource: RateTrackerDatabase
 ) : RateTrackerRepository {
 
+    //TODO: refactor
     override suspend fun getCurrencySymbols(): Flow<CustomResult<List<CurrencySymbols>?>> {
         return flow {
             val safeResult = safeCall {
@@ -58,6 +60,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
         }
     }
 
+    //TODO: refactor
     override suspend fun loadLatestRates(
         base: String,
         withSync: Boolean
@@ -66,7 +69,7 @@ class RateTrackerRepositoryImpl @Inject constructor(
             val safeResult = safeCall {
                 if (withSync) {
 //                    val result = rateTrackerApi.getLatestRates(base)
-                    val result = when(base) {
+                    val result = when (base) {
                         "USD" -> ratesDtoUSD
                         "EUR" -> ratesDtoEUR
                         else -> ratesDtoJPY
@@ -106,26 +109,25 @@ class RateTrackerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?> {
-        return safeCall {
-            val pairs = localSource.rateTrackerDao.getFavoriteRatesList()
-            val favoritePairs = pairs
-                .groupBy { it.baseSymbols }
-                .mapValues { entry ->
-                    entry.value.mapNotNull { it.symbols }
-                }
+    override suspend fun getFavoriteRates(): Flow<CustomResult<List<FavoriteRatesValue>?>> {
+        return localSource.rateTrackerDao.getFavoriteRatesList().map { pairs ->
+            safeCall {
+                val favoritePairs = pairs
+                    .groupBy { it.baseSymbols }
+                    .mapValues { entry ->
+                        entry.value.mapNotNull { it.symbols }
+                    }
 
-            return@safeCall if (pairs.isNotEmpty()) {
-                val result = favoritePairs.map {
-                    generateSelectedRates(it.key, it.value.joinToString())
-                    //rateTrackerApi.getLatestRatesForPair(it.key, it.value.joinToString())
+                if (pairs.isNotEmpty()) {
+                    favoritePairs
+                        .map {
+                            generateSelectedRates(it.key, it.value.joinToString())
+                            //rateTrackerApi.getLatestRatesForPair(it.key, it.value.joinToString())
+                        }
+                        .flatMap { ratesDto -> ratesDto.toDomainModels() }
+                } else {
+                    emptyList()
                 }
-
-                result.flatMap { ratesDto ->
-                    ratesDto.toDomainModels()
-                }
-            } else {
-                emptyList<FavoriteRatesValue>()
             }
         }
     }

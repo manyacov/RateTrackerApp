@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +30,7 @@ import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.ui.theme.Outline
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.presentation.ui_parts.EmptyDescription
@@ -47,7 +47,7 @@ fun AllRatesScreen(
     navController: NavHostController? = null,
     viewModel: AllRatesViewModel,
 ) {
-    val state = viewModel.state.collectAsState()
+    val state = viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.getCurrencySymbols()
