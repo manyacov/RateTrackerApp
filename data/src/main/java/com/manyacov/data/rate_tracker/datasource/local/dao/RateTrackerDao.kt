@@ -58,5 +58,5 @@ interface RateTrackerDao {
     suspend fun removeFavoriteRatesEntity(base: String, symbols: String)
 
     @Query("SELECT * FROM favorites_table")
-    suspend fun getFavoriteRatesList(): List<FavoritePairEntity>
+    fun getFavoriteRatesList(): Flow<List<FavoritePairEntity>>
 }

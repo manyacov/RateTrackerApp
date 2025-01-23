@@ -52,6 +52,7 @@ class AllRatesViewModel @Inject constructor(
                     }
                     getLatestRates(base == null)
                 }
+
                 else -> {
                     _state.update {
                         state.value.copy(isLoading = false, error = result.issueType)
@@ -91,6 +92,7 @@ class AllRatesViewModel @Inject constructor(
                         )
                     }
                 }
+
                 else -> {
                     _state.update {
                         state.value.copy(isLoading = false, error = result?.issueType)
@@ -101,16 +103,6 @@ class AllRatesViewModel @Inject constructor(
     }
 
     fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
-        when (val result =
-            repository.changeFavoriteStatus(state.value.baseSymbols?.symbols ?: "", symbols)) {
-
-            is CustomResult.Success -> {}
-
-            is CustomResult.Error -> {
-                _state.update {
-                    state.value.copy(isLoading = false, error = result.issueType)
-                }
-            }
-        }
+        repository.changeFavoriteStatus(state.value.baseSymbols?.symbols ?: "", symbols)
     }
 }

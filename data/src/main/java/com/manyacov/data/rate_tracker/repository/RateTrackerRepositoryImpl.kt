@@ -130,35 +130,29 @@ class RateTrackerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun changeFavoriteStatus(base: String, symbols: String): CustomResult<Unit?> {
-        return safeCall {
-            val db = localSource.rateTrackerDao
+    override suspend fun changeFavoriteStatus(base: String, symbols: String) {
+        val db = localSource.rateTrackerDao
 
-            val rateEntity = db.getRateEntityBySymbols(symbols)
-            if (rateEntity.isFavorite) {
-                removeFavoritePair(base, symbols)
-            } else {
-                saveFavoritePair(base, symbols)
-            }
-            db.updateRateEntity(symbols, !rateEntity.isFavorite)
+        val rateEntity = db.getRateEntityBySymbols(symbols)
+        if (rateEntity.isFavorite) {
+            removeFavoritePair(base, symbols)
+        } else {
+            saveFavoritePair(base, symbols)
         }
+        db.updateRateEntity(symbols, !rateEntity.isFavorite)
     }
 
-    private suspend fun saveFavoritePair(base: String, symbols: String): CustomResult<Unit?> {
-        return safeCall {
-            val db = localSource.rateTrackerDao
-            val favoriteEntity = FavoritePairEntity(
-                baseSymbols = base,
-                symbols = symbols,
-            )
-            db.saveFavoriteRatesEntity(favoriteEntity)
-        }
+    private suspend fun saveFavoritePair(base: String, symbols: String) {
+        val db = localSource.rateTrackerDao
+        val favoriteEntity = FavoritePairEntity(
+            baseSymbols = base,
+            symbols = symbols,
+        )
+        db.saveFavoriteRatesEntity(favoriteEntity)
     }
 
-    override suspend fun removeFavoritePair(base: String, symbols: String): CustomResult<Unit?> {
-        return safeCall {
-            val db = localSource.rateTrackerDao
-            db.removeFavoriteRatesEntity(base, symbols)
-        }
+    private suspend fun removeFavoritePair(base: String, symbols: String) {
+        val db = localSource.rateTrackerDao
+        db.removeFavoriteRatesEntity(base, symbols)
     }
 }

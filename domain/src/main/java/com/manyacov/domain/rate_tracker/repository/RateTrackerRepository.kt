@@ -12,9 +12,7 @@ interface RateTrackerRepository {
 
     suspend fun loadLatestRates(base: String, withSync: Boolean): Flow<CustomResult<List<CurrencyRateValue>>?>
 
-    suspend fun getFavoriteRates(): CustomResult<List<FavoriteRatesValue>?>
+    suspend fun getFavoriteRates(): Flow<CustomResult<List<FavoriteRatesValue>?>>
 
-    suspend fun changeFavoriteStatus(base: String, symbols: String): CustomResult<Unit?>
-
-    suspend fun removeFavoritePair(base: String, symbols: String): CustomResult<Unit?>
+    suspend fun changeFavoriteStatus(base: String, symbols: String)
 }
