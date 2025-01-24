@@ -34,10 +34,9 @@ fun CurrencyPriceItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick(item.symbols) }
-            .padding(
-                vertical = dimensionResource(id = R.dimen.space_size_4),
-            ),
+            .padding(vertical = dimensionResource(id = R.dimen.space_size_4))
+            .clip(roundedCorner12)
+            .clickable { onClick(item.symbols) },
     ) {
         Row(
             modifier = modifier
