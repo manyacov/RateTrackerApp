@@ -1,7 +1,6 @@
-package com.manyacov.presentation.ui_parts
+package com.manyacov.presentation.ui_parts.dropdown
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,15 +24,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
-import com.manyacov.ui.theme.LightPrimary
 import com.manyacov.ui.theme.Secondary
 import com.manyacov.ui.theme.roundedCorner8
 import com.manyacov.ui.R
-import com.manyacov.ui.theme.DefaultBg
+import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.theme.roundedCorner12
 
 @Composable
@@ -43,7 +42,7 @@ fun SymbolsDropdownMenu(
     enabled: Boolean = true,
     items: List<CurrencySymbols>,
     selectedIndex: Int = 0,
-    onItemSelected: (index: Int, item: CurrencySymbols) -> Unit,
+    onItemSelected: (index: Int, item: CurrencySymbols) -> Unit = { _, _ -> },
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -83,7 +82,6 @@ fun SymbolsDropdownMenu(
             },
             onValueChange = { },
             readOnly = true,
-            //contentPadding = PaddingValues(),
             colors = outlinedTextFieldColors
         )
 
@@ -91,16 +89,16 @@ fun SymbolsDropdownMenu(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(roundedCorner8)
-                .clickable(enabled = enabled) { expanded = true },
+                .clickable(enabled = enabled) { expanded = true }
+                .testTag("symbols_dropdown_menu_surface"),
             color = Color.Transparent,
         ) {}
     }
 
     if (expanded) {
-        Dialog(
-            onDismissRequest = { expanded = false },
-        ) {
+        Dialog(onDismissRequest = { expanded = false }) {
             Surface(
+                modifier = Modifier.padding(dimensionResource(R.dimen.space_size_16)),
                 shape = roundedCorner12,
             ) {
                 val listState = rememberLazyListState()
@@ -110,10 +108,14 @@ fun SymbolsDropdownMenu(
                     }
                 }
 
-                LazyColumn(modifier = Modifier.fillMaxWidth(), state = listState) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = listState
+                ) {
                     itemsIndexed(items) { index, item ->
                         val selectedItem = index == selectedIndex
                         CurrencyDropdownMenuItem(
+                            modifier = modifier.testTag("item_${item.symbols}"),
                             text = item.symbols,
                             selected = selectedItem,
                             onClick = {
@@ -128,26 +130,16 @@ fun SymbolsDropdownMenu(
     }
 }
 
+@Preview
 @Composable
-fun CurrencyDropdownMenuItem(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val bgColor = when {
-        selected -> LightPrimary
-        else -> DefaultBg
-    }
-
-    Box(modifier = Modifier
-        .clickable { onClick() }
-        .background(color = bgColor)
-        .fillMaxWidth()
-    ) {
-        Text(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.space_size_16)),
-            text = text,
-            style = MaterialTheme.typography.displayMedium,
+fun SymbolsDropdownMenuPreview() {
+    RateTrackerAppTheme {
+        SymbolsDropdownMenu(
+            items = listOf(
+                CurrencySymbols("USD"),
+                CurrencySymbols("EUR"),
+                CurrencySymbols("BYN"),
+            )
         )
     }
 }

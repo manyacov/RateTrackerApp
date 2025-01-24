@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.presentation.ui_parts.CurrencyPriceItem
 import com.manyacov.presentation.ui_parts.FilterItem
-import com.manyacov.presentation.ui_parts.SymbolsDropdownMenu
+import com.manyacov.presentation.ui_parts.dropdown.SymbolsDropdownMenu
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
