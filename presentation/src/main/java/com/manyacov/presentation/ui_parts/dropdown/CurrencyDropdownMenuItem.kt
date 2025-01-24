@@ -10,11 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.manyacov.ui.R
 import com.manyacov.ui.theme.DefaultBg
 import com.manyacov.ui.theme.LightPrimary
+import com.manyacov.ui.theme.LocalDim
 import com.manyacov.ui.theme.RateTrackerAppTheme
 
 @Composable
@@ -37,7 +36,7 @@ fun CurrencyDropdownMenuItem(
     ) {
         Text(
             modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.space_size_16)),
+                .padding(LocalDim.current.spaceSize16),
             text = text,
             style = MaterialTheme.typography.displayMedium,
         )

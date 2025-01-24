@@ -12,16 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.theme.Yellow
-import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.CardBg
+import com.manyacov.ui.theme.LocalDim
+import com.manyacov.ui.theme.LocalTextDim
 import com.manyacov.ui.theme.roundedCorner12
 
 @Composable
@@ -35,7 +35,7 @@ fun FavoritesPriceItem(
             .fillMaxWidth()
             .clickable { onClick(item.baseSymbols, item.symbols) }
             .padding(
-                vertical = dimensionResource(id = R.dimen.space_size_4),
+                vertical = LocalDim.current.spaceSize4,
             ),
     ) {
         Row(
@@ -44,8 +44,8 @@ fun FavoritesPriceItem(
                 .clip(roundedCorner12)
                 .background(color = CardBg)
                 .padding(
-                    vertical = dimensionResource(id = R.dimen.space_size_14),
-                    horizontal = dimensionResource(id = R.dimen.space_size_16)
+                    vertical = LocalDim.current.spaceSize14,
+                    horizontal = LocalDim.current.spaceSize16
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -53,14 +53,14 @@ fun FavoritesPriceItem(
                 modifier = Modifier.weight(1f),
                 text = "${item.baseSymbols}/${item.symbols}",
                 fontWeight = FontWeight.Normal,
-                fontSize = fontDimensionResource(id = R.dimen.text_size_14)
+                fontSize = LocalTextDim.current.spaceSize14
             )
 
             Text(
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
+                modifier = Modifier.padding(horizontal = LocalDim.current.spaceSize16),
                 text = item.value.toString(),
                 fontWeight = FontWeight.Bold,
-                fontSize = fontDimensionResource(id = R.dimen.text_size_16)
+                fontSize = LocalTextDim.current.spaceSize16
             )
 
             Icon(

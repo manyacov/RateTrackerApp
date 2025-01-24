@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
@@ -33,6 +32,7 @@ import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.ui.theme.Secondary
 import com.manyacov.ui.theme.roundedCorner8
 import com.manyacov.ui.R
+import com.manyacov.ui.theme.LocalDim
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.theme.roundedCorner12
 
@@ -59,7 +59,7 @@ fun SymbolsDropdownMenu(
         modifier = modifier
             .clip(roundedCorner8)
             .border(
-                border = BorderStroke(dimensionResource(id = R.dimen.space_size_1), Secondary),
+                border = BorderStroke(LocalDim.current.spaceSize1, Secondary),
                 shape = roundedCorner8
             )
     ) {
@@ -98,7 +98,7 @@ fun SymbolsDropdownMenu(
     if (expanded) {
         Dialog(onDismissRequest = { expanded = false }) {
             Surface(
-                modifier = Modifier.padding(dimensionResource(R.dimen.space_size_16)),
+                modifier = Modifier.padding(LocalDim.current.spaceSize16),
                 shape = roundedCorner12,
             ) {
                 val listState = rememberLazyListState()

@@ -11,15 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.manyacov.ui.theme.Primary
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.theme.roundedCorner20
-import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
 import com.manyacov.ui.R
+import com.manyacov.ui.theme.LocalDim
+import com.manyacov.ui.theme.LocalTextDim
 
 @Composable
 fun BlueThemeButton(
@@ -30,7 +30,7 @@ fun BlueThemeButton(
     Button(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(id = R.dimen.space_size_40))
+            .height(LocalDim.current.spaceSize40)
             .background(
                 color = Primary,
                 shape = roundedCorner20
@@ -44,7 +44,7 @@ fun BlueThemeButton(
     ) {
         Text(
             text = label,
-            fontSize = fontDimensionResource(id = R.dimen.text_size_14),
+            fontSize = LocalTextDim.current.spaceSize14,
             color = Color.White,
             fontWeight = FontWeight.Normal,
         )
@@ -57,7 +57,7 @@ fun BlueThemeButtonPreview() {
     RateTrackerAppTheme {
         BlueThemeButton(
             modifier = Modifier
-                .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
+                .padding(horizontal = LocalDim.current.spaceSize16),
             label = stringResource(id = R.string.apply)
         )
     }

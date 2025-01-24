@@ -22,7 +22,6 @@ import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.presentation.ui_parts.EmptyDescription
@@ -32,6 +31,7 @@ import com.manyacov.presentation.ui_parts.Loader
 import com.manyacov.presentation.ui_parts.NoInternetLine
 import com.manyacov.presentation.utils.handleError
 import com.manyacov.presentation.utils.isInternetAvailable
+import com.manyacov.ui.theme.LocalDim
 import com.manyacov.ui.theme.Outline
 
 @Composable
@@ -68,10 +68,10 @@ fun FavoritesScreen(
                 .fillMaxWidth()
                 .background(color = HeaderBg)
                 .padding(
-                    horizontal = dimensionResource(id = R.dimen.space_size_16),
-                    vertical = dimensionResource(id = R.dimen.space_size_12)
+                    horizontal = LocalDim.current.spaceSize16,
+                    vertical = LocalDim.current.spaceSize12
                 ),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.space_size_18))
+            verticalArrangement = Arrangement.spacedBy(LocalDim.current.spaceSize18)
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -82,7 +82,7 @@ fun FavoritesScreen(
 
         Spacer(
             modifier = Modifier
-                .height(dimensionResource(id = R.dimen.space_size_1))
+                .height(LocalDim.current.spaceSize1)
                 .fillMaxWidth()
                 .background(color = Outline)
         )
@@ -105,7 +105,7 @@ fun FavoritesScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
+                contentPadding = PaddingValues(LocalDim.current.spaceSize16)
             ) {
                 items(state.listFavorites) { item ->
                     FavoritesPriceItem(
@@ -120,7 +120,7 @@ fun FavoritesScreen(
 
         Spacer(
             modifier = Modifier
-                .height(dimensionResource(id = R.dimen.space_size_1))
+                .height(LocalDim.current.spaceSize1)
                 .fillMaxWidth()
                 .background(color = Outline)
         )
