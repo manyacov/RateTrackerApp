@@ -14,10 +14,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
-import com.manyacov.ui.theme.LightPrimary
-import com.manyacov.ui.theme.Primary
-import com.manyacov.ui.theme.Secondary
-import com.manyacov.ui.theme.TextDefault
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -50,11 +46,11 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Primary,
-                    unselectedIconColor = Secondary,
-                    selectedTextColor = TextDefault,
-                    unselectedTextColor = Secondary,
-                    indicatorColor = LightPrimary
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                    selectedTextColor = MaterialTheme.colorScheme.inversePrimary,
+                    unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                    indicatorColor = MaterialTheme.colorScheme.inverseSurface
                 )
             )
         }

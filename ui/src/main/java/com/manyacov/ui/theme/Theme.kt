@@ -20,7 +20,9 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = OnPrimary,
     secondary = Secondary,
     background = DefaultBg,
-    outline = Outline
+    outline = Outline,
+    inverseSurface = LightPrimary,
+    inversePrimary = TextDefault
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -28,7 +30,9 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = OnPrimary,
     secondary = Secondary,
     background = DefaultBg,
-    outline = Outline
+    outline = Outline,
+    inverseSurface = LightPrimary,
+    inversePrimary = TextDefault
 )
 
 @Composable

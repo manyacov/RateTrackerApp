@@ -25,8 +25,10 @@ import com.manyacov.presentation.favorites.FavoritesViewModel
 import com.manyacov.presentation.filter.FilterScreen
 import com.manyacov.ratetrackerapp.navigation.BottomNavigationBar
 import com.manyacov.ratetrackerapp.navigation.NavItem
+import com.manyacov.ratetrackerapp.utils.BOTTOM_NAV_CHANGING_DURATION
 import com.manyacov.ratetrackerapp.utils.SCREEN_CHANGING_DURATION
 import com.manyacov.ui.theme.RateTrackerAppTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -35,6 +37,7 @@ fun MainScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
         navController.currentBackStackEntryFlow.collectLatest { backStackEntry ->
+            delay(BOTTOM_NAV_CHANGING_DURATION)
             bottomBarState = backStackEntry.destination.route != NavItem.Filters.path
         }
     }
