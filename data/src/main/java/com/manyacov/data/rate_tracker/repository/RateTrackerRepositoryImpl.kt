@@ -20,7 +20,6 @@ import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.domain.rate_tracker.model.FavoriteRatesValue
 import com.manyacov.domain.rate_tracker.utils.CustomResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -29,83 +28,54 @@ class RateTrackerRepositoryImpl @Inject constructor(
     private val localSource: RateTrackerDatabase
 ) : RateTrackerRepository {
 
-    //TODO: refactor
     override suspend fun getCurrencySymbols(): Flow<CustomResult<List<CurrencySymbols>?>> {
-        return flow {
-            val safeResult = safeCall {
-                val checkElement = localSource.rateTrackerDao.getFirstElement()
-                if (checkElement != null && isLessThanOneMonthAgo(checkElement.lastUpdate)) {
-                    localSource.rateTrackerDao.getCurrencySymbolsList()
-                } else {
-                    val result = mockSymbolsDto//rateTrackerApi.getCurrencySymbols()
-
-                    val entities = result.toEntityModels()
-                    localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
-                    localSource.rateTrackerDao.getCurrencySymbolsList()
-                }
+        val checkElement = localSource.rateTrackerDao.getFirstElement()
+        return if (checkElement != null && isLessThanOneMonthAgo(checkElement.lastUpdate)) {
+            localSource.rateTrackerDao.getCurrencySymbolsList().map { symbols ->
+                val domainModels = symbols.map { entity -> entity.toDomainModel() }
+                CustomResult.Success(domainModels)
             }
+        } else {
+            val result = mockSymbolsDto//rateTrackerApi.getCurrencySymbols()
 
-            when (safeResult) {
-                is CustomResult.Success -> {
-                    safeResult.data?.collect { symbols ->
-                        val domainModels = symbols.map { entity -> entity.toDomainModel() }
-                        emit(CustomResult.Success(domainModels))
-                    }
-                }
-
-                is CustomResult.Error -> {
-                    emit(CustomResult.Error(issueType = safeResult.issueType))
-                }
+            val entities = result.toEntityModels()
+            localSource.rateTrackerDao.saveCurrencySymbolsList(entities)
+            localSource.rateTrackerDao.getCurrencySymbolsList().map { symbols ->
+                val domainModels = symbols.map { entity -> entity.toDomainModel() }
+                CustomResult.Success(domainModels)
             }
         }
     }
 
-    //TODO: refactor
     override suspend fun loadLatestRates(
         base: String,
         withSync: Boolean
     ): Flow<CustomResult<List<CurrencyRateValue>>?> {
-        return flow {
-            val safeResult = safeCall {
-                if (withSync) {
+
+        if (withSync) {
 //                    val result = rateTrackerApi.getLatestRates(base)
-                    val result = when (base) {
-                        "USD" -> ratesDtoUSD
-                        "EUR" -> ratesDtoEUR
-                        else -> ratesDtoJPY
-                    }
-
-                    val favoritesList =
-                        localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
-
-                    val entities = result.rates.map { rate ->
-                        rate.toEntityRateModel(
-                            isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
-                            date = result.date
-                        )
-                    }
-
-                    localSource.rateTrackerDao.clearRatesTable()
-                    localSource.rateTrackerDao.saveRatesList(entities)
-                }
-
-                val db = localSource.rateTrackerDao
-                db.getRateList()
+            val result = when (base) {
+                "USD" -> ratesDtoUSD
+                "EUR" -> ratesDtoEUR
+                else -> ratesDtoJPY
             }
 
-            when (safeResult) {
-                is CustomResult.Success -> {
-                    safeResult.data?.collect { rateEntities ->
-                        val domainModels =
-                            rateEntities.map { entity -> entity.toDomainModels() }
-                        emit(CustomResult.Success(domainModels))
-                    }
-                }
+            val favoritesList = localSource.rateTrackerDao.getFavoriteRatesListByBase(base)
 
-                is CustomResult.Error -> {
-                    emit(CustomResult.Error(issueType = safeResult.issueType))
-                }
+            val entities = result.rates.map { rate ->
+                rate.toEntityRateModel(
+                    isFavorite = favoritesList.map { it.symbols }.contains(rate.key),
+                    date = result.date
+                )
             }
+
+            localSource.rateTrackerDao.clearRatesTable()
+            localSource.rateTrackerDao.saveRatesList(entities)
+        }
+
+        return localSource.rateTrackerDao.getRateList().map { rates ->
+            val domainModels = rates.map { entity -> entity.toDomainModels() }
+            CustomResult.Success(domainModels)
         }
     }
 
