@@ -30,10 +30,14 @@ object DataModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-        return OkHttpClient.Builder()
+        val builder = OkHttpClient.Builder()
             .addInterceptor(HeaderInterceptor())
-            .addInterceptor(loggingInterceptor)
-            .build()
+
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(loggingInterceptor)
+        }
+
+        return builder.build()
     }
 
     @Provides
