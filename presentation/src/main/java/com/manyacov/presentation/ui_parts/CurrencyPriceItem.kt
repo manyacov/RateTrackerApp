@@ -69,8 +69,7 @@ fun CurrencyPriceItem(
                 } else {
                     painterResource(id = R.drawable.ic_star_off)
                 },
-                tint = if (item.isFavorite) Yellow
-                else Secondary,
+                tint = if (item.isFavorite) Yellow else Secondary,
                 contentDescription = ""
             )
         }
