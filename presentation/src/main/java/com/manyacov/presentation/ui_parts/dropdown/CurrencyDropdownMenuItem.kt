@@ -23,16 +23,14 @@ fun CurrencyDropdownMenuItem(
     selected: Boolean,
     onClick: () -> Unit = {},
 ) {
-    val bgColor = when {
-        selected -> LightPrimary
-        else -> DefaultBg
-    }
+    val bgColor = if (selected) LightPrimary else DefaultBg
 
-    Box(modifier = modifier
-        .clickable { onClick() }
-        .background(color = bgColor)
-        .fillMaxWidth()
-        .testTag("dropdown_item_box")
+    Box(
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .background(color = bgColor)
+            .fillMaxWidth()
+            .testTag("dropdown_item_box")
     ) {
         Text(
             modifier = Modifier
