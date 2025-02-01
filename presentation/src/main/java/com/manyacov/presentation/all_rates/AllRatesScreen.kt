@@ -28,16 +28,13 @@ import com.manyacov.presentation.ui_parts.dropdown.SymbolsDropdownMenu
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.ui.theme.Outline
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.ErrorBox
 import com.manyacov.presentation.ui_parts.Loader
-import com.manyacov.presentation.ui_parts.NoInternetLine
 import com.manyacov.presentation.utils.handleError
-import com.manyacov.presentation.utils.isInternetAvailable
 import com.manyacov.ui.theme.LocalDim
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -123,8 +120,6 @@ fun AllRatesScreen(
                 .fillMaxWidth()
                 .background(color = Outline)
         )
-
-        NoInternetLine(isInternetAvailable(LocalContext.current))
 
         Loader(state.isLoading)
 
