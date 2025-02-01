@@ -120,7 +120,7 @@ val ratesDtoJPY = RatesDto(
 fun generateSelectedRates(base: String?, symbols: String): RatesDto {
     val rates = symbols.split(", ").associateWith { generateRandomDouble(0.0, 100.0) }
     return RatesDto(
-        base = base ?: "",
+        base = base.orEmpty(),
         date = "2023-01-01",
         rates = rates,
         success = true,

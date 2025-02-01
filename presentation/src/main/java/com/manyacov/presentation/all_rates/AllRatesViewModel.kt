@@ -69,7 +69,7 @@ class AllRatesViewModel @Inject constructor(
     private suspend fun getLatestRates(withSync: Boolean) {
         _state.update { state.value.copy(isLoading = true) }
         repository.loadLatestRates(
-            state.value.baseSymbols?.symbols ?: "",
+            state.value.baseSymbols?.symbols.orEmpty(),
             withSync
         ).collect { result ->
             when (result) {
@@ -103,6 +103,6 @@ class AllRatesViewModel @Inject constructor(
     }
 
     fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.changeFavoriteStatus(state.value.baseSymbols?.symbols ?: "", symbols)
+        repository.changeFavoriteStatus(state.value.baseSymbols?.symbols.orEmpty(), symbols)
     }
 }

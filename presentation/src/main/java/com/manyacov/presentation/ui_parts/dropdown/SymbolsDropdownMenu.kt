@@ -65,7 +65,7 @@ fun SymbolsDropdownMenu(
     ) {
         OutlinedTextField(
             textStyle = MaterialTheme.typography.displayMedium,
-            value = items.getOrNull(selectedIndex)?.symbols ?: "",
+            value = items.getOrNull(selectedIndex)?.symbols.orEmpty(),
             enabled = enabled,
             modifier = modifier
                 .fillMaxWidth()

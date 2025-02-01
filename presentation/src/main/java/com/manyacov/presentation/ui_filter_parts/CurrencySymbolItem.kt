@@ -14,9 +14,10 @@ fun CurrencySymbolItem(
 ) {
     Text(
         modifier = modifier,
-        text = item.symbols ?: ""
+        text = item.symbols
     )
 }
+
 @Preview
 @Composable
 fun CurrencySymbolItemPreview() {
