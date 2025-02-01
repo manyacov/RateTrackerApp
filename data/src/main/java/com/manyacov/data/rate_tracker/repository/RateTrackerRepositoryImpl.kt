@@ -51,7 +51,6 @@ class RateTrackerRepositoryImpl @Inject constructor(
         base: String,
         withSync: Boolean
     ): Flow<CustomResult<List<CurrencyRateValue>>?> {
-
         if (withSync) {
 //                    val result = rateTrackerApi.getLatestRates(base)
             val result = when (base) {
@@ -103,28 +102,28 @@ class RateTrackerRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeFavoriteStatus(base: String, symbols: String) {
-        val db = localSource.rateTrackerDao
+        val dao = localSource.rateTrackerDao
 
-        val rateEntity = db.getRateEntityBySymbols(symbols)
+        val rateEntity = dao.getRateEntityBySymbols(symbols)
         if (rateEntity.isFavorite) {
             removeFavoritePair(base, symbols)
         } else {
             saveFavoritePair(base, symbols)
         }
-        db.updateRateEntity(symbols, !rateEntity.isFavorite)
+        dao.updateRateEntity(symbols, !rateEntity.isFavorite)
     }
 
     private suspend fun saveFavoritePair(base: String, symbols: String) {
-        val db = localSource.rateTrackerDao
+        val dao = localSource.rateTrackerDao
         val favoriteEntity = FavoritePairEntity(
             baseSymbols = base,
             symbols = symbols,
         )
-        db.saveFavoriteRatesEntity(favoriteEntity)
+        dao.saveFavoriteRatesEntity(favoriteEntity)
     }
 
     private suspend fun removeFavoritePair(base: String, symbols: String) {
-        val db = localSource.rateTrackerDao
-        db.removeFavoriteRatesEntity(base, symbols)
+        val dao = localSource.rateTrackerDao
+        dao.removeFavoriteRatesEntity(base, symbols)
     }
 }
