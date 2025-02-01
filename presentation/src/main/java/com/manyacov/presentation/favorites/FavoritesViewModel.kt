@@ -27,7 +27,7 @@ class FavoritesViewModel @Inject constructor(
             when (result) {
                 is CustomResult.Success -> {
                     _state.update {
-                        state.value.copy(
+                        it.copy(
                             listFavorites = result.data ?: emptyList(),
                             isLoading = false,
                             error = null
@@ -37,10 +37,7 @@ class FavoritesViewModel @Inject constructor(
 
                 is CustomResult.Error -> {
                     _state.update {
-                        state.value.copy(
-                            isLoading = false,
-                            error = result.issueType
-                        )
+                        it.copy(isLoading = false, error = result.issueType)
                     }
                 }
             }

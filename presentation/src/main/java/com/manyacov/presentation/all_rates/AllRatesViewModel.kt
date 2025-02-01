@@ -26,13 +26,13 @@ class AllRatesViewModel @Inject constructor(
 
     fun updateFilterOption(option: SortOptions) {
         _state.update {
-            state.value.copy(filterOption = option)
+            it.copy(filterOption = option)
         }
     }
 
     fun updateSelectedSymbols(symbols: CurrencySymbols) = viewModelScope.launch(Dispatchers.IO) {
         _state.update {
-            state.value.copy(baseSymbols = symbols)
+            it.copy(baseSymbols = symbols)
         }
         getLatestRates(true)
     }
@@ -43,7 +43,7 @@ class AllRatesViewModel @Inject constructor(
                 is CustomResult.Success -> {
                     val base = state.value.baseSymbols
                     _state.update {
-                        state.value.copy(
+                        it.copy(
                             symbols = result.data ?: emptyList(),
                             baseSymbols = base ?: result.data?.get(0),
                             isLoading = false,
@@ -54,9 +54,7 @@ class AllRatesViewModel @Inject constructor(
                 }
 
                 else -> {
-                    _state.update {
-                        state.value.copy(isLoading = false, error = result.issueType)
-                    }
+                    _state.update { it.copy(isLoading = false, error = result.issueType) }
                 }
             }
         }
@@ -67,7 +65,7 @@ class AllRatesViewModel @Inject constructor(
     }
 
     private suspend fun getLatestRates(withSync: Boolean) {
-        _state.update { state.value.copy(isLoading = true) }
+        _state.update { it.copy(isLoading = true) }
         repository.loadLatestRates(
             state.value.baseSymbols?.symbols.orEmpty(),
             withSync
@@ -85,7 +83,7 @@ class AllRatesViewModel @Inject constructor(
                     }
 
                     _state.update {
-                        state.value.copy(
+                        it.copy(
                             ratesList = sortedList ?: emptyList(),
                             isLoading = false,
                             error = null
@@ -94,9 +92,7 @@ class AllRatesViewModel @Inject constructor(
                 }
 
                 else -> {
-                    _state.update {
-                        state.value.copy(isLoading = false, error = result?.issueType)
-                    }
+                    _state.update { it.copy(isLoading = false, error = result?.issueType) }
                 }
             }
         }
