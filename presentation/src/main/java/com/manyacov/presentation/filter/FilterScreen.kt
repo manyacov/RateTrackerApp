@@ -99,7 +99,7 @@ fun FilterScreen(
         )
 
         SortOptions.entries.forEach {
-            val title = stringResource(id = it.getDescriptionRes())
+            val title = stringResource(id = it.descriptionRes)
 
             SortOption(
                 modifier = Modifier
