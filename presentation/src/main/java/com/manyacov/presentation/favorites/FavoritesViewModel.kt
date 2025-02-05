@@ -23,23 +23,22 @@ class FavoritesViewModel @Inject constructor(
 
     fun getFavoritesList() = viewModelScope.launch(Dispatchers.IO) {
         _state.update { state.value.copy(isLoading = true) }
-        when (val result = repository.getFavoriteRates()) {
-            is CustomResult.Success -> {
-                _state.update {
-                    state.value.copy(
-                        listFavorites = result.data ?: emptyList(),
-                        isLoading = false,
-                        error = null
-                    )
+        repository.getFavoriteRates().collect { result ->
+            when (result) {
+                is CustomResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            listFavorites = result.data ?: emptyList(),
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }
-            }
 
-            is CustomResult.Error -> {
-                _state.update {
-                    state.value.copy(
-                        isLoading = false,
-                        error = result.issueType
-                    )
+                is CustomResult.Error -> {
+                    _state.update {
+                        it.copy(isLoading = false, error = result.issueType)
+                    }
                 }
             }
         }
@@ -54,19 +53,6 @@ class FavoritesViewModel @Inject constructor(
         }
 
     private suspend fun removeFavorite(baseSymbols: String, symbols: String) {
-        when (val result = repository.removeFavoritePair(base = baseSymbols, symbols = symbols)) {
-            is CustomResult.Success -> {
-                getFavoritesList()
-            }
-
-            is CustomResult.Error -> {
-                _state.update {
-                    state.value.copy(
-                        isLoading = false,
-                        error = result.issueType
-                    )
-                }
-            }
-        }
+        repository.changeFavoriteStatus(base = baseSymbols, symbols = symbols)
     }
 }

@@ -1,17 +1,13 @@
 package com.manyacov.data.di
 
-import android.content.Context
 import com.manyacov.data.BuildConfig
-import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
+import com.manyacov.data.rate_tracker.datasource.remote.utils.HeaderInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -20,16 +16,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-    class HeaderInterceptor : Interceptor {
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val originalRequest = chain.request()
-            val requestWithHeaders = originalRequest.newBuilder()
-                .addHeader("apikey", BuildConfig.RATE_TRACKER_API_KEY)
-                .build()
-            return chain.proceed(requestWithHeaders)
-        }
-    }
-
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
@@ -41,10 +27,14 @@ object DataModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-        return OkHttpClient.Builder()
+        val builder = OkHttpClient.Builder()
             .addInterceptor(HeaderInterceptor())
-            .addInterceptor(loggingInterceptor)
-            .build()
+
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(loggingInterceptor)
+        }
+
+        return builder.build()
     }
 
     @Provides
@@ -61,13 +51,5 @@ object DataModule {
     @Singleton
     fun provideRateTrackerApi(retrofit: Retrofit): RateTrackerApi {
         return retrofit.create(RateTrackerApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideRateTrackerDatabase(
-        @ApplicationContext context: Context
-    ): RateTrackerDatabase {
-        return RateTrackerDatabase(context)
     }
 }

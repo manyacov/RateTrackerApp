@@ -12,11 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
+import com.manyacov.ui.theme.LocalDim
 import com.manyacov.ui.theme.roundedCorner8
 
 @Composable
@@ -26,20 +26,20 @@ fun FilterItem(
 ) {
     Box(
         modifier = modifier
-            .size(dimensionResource(id = R.dimen.space_size_48))
+            .size(LocalDim.current.spaceSize48)
             .clip(shape = roundedCorner8)
             .border(
                 border = BorderStroke(
-                    dimensionResource(id = R.dimen.space_size_1),
+                    LocalDim.current.spaceSize1,
                     MaterialTheme.colorScheme.secondary
                 ), shape = roundedCorner8
             )
             .background(MaterialTheme.colorScheme.background)
             .clickable { onClick() }
-            .padding(dimensionResource(id = R.dimen.space_size_12))
+            .padding(LocalDim.current.spaceSize12)
     ) {
         Icon(
-            modifier = modifier.size(dimensionResource(id = R.dimen.space_size_24)),
+            modifier = modifier.size(LocalDim.current.spaceSize24),
             painter = painterResource(id = R.drawable.ic_filter),
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = ""

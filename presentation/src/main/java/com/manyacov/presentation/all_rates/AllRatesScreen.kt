@@ -12,14 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,20 +24,18 @@ import androidx.navigation.NavHostController
 import com.manyacov.domain.rate_tracker.model.CurrencyRateValue
 import com.manyacov.presentation.ui_parts.CurrencyPriceItem
 import com.manyacov.presentation.ui_parts.FilterItem
-import com.manyacov.presentation.ui_parts.SymbolsDropdownMenu
+import com.manyacov.presentation.ui_parts.dropdown.SymbolsDropdownMenu
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manyacov.ui.theme.Outline
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
 import com.manyacov.presentation.ui_parts.EmptyDescription
 import com.manyacov.presentation.ui_parts.ErrorBox
 import com.manyacov.presentation.ui_parts.Loader
-import com.manyacov.presentation.ui_parts.NoInternetLine
 import com.manyacov.presentation.utils.handleError
-import com.manyacov.presentation.utils.isInternetAvailable
+import com.manyacov.ui.theme.LocalDim
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -49,7 +44,7 @@ fun AllRatesScreen(
     navController: NavHostController? = null,
     viewModel: AllRatesViewModel,
 ) {
-    val state = viewModel.state.collectAsState()
+    val state = viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.getCurrencySymbols()
@@ -84,10 +79,10 @@ fun AllRatesScreen(
                 .fillMaxWidth()
                 .background(color = HeaderBg)
                 .padding(
-                    horizontal = dimensionResource(id = R.dimen.space_size_16),
-                    vertical = dimensionResource(id = R.dimen.space_size_12)
+                    horizontal = LocalDim.current.spaceSize16,
+                    vertical = LocalDim.current.spaceSize12
                 ),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.space_size_18))
+            verticalArrangement = Arrangement.spacedBy(LocalDim.current.spaceSize18)
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -97,14 +92,14 @@ fun AllRatesScreen(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.space_size_8))
+                horizontalArrangement = Arrangement.spacedBy(LocalDim.current.spaceSize8)
             ) {
                 val base = state.baseSymbols
                 val selectedIndex = state.symbols.indexOf(base)
 
                 SymbolsDropdownMenu(
                     modifier = Modifier
-                        .height(dimensionResource(id = R.dimen.space_size_48))
+                        .height(LocalDim.current.spaceSize48)
                         .weight(1f),
                     items = state.symbols,
                     selectedIndex = selectedIndex,
@@ -121,16 +116,14 @@ fun AllRatesScreen(
 
         Spacer(
             modifier = Modifier
-                .height(dimensionResource(id = R.dimen.space_size_1))
+                .height(LocalDim.current.spaceSize1)
                 .fillMaxWidth()
                 .background(color = Outline)
         )
 
-        NoInternetLine(isInternetAvailable(LocalContext.current))
-
         Loader(state.isLoading)
 
-        if(state.error != null) {
+        if (state.error != null) {
             ErrorBox(
                 description = stringResource(id = state.error.handleError()),
                 reload = reloadRates
@@ -144,7 +137,7 @@ fun AllRatesScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(dimensionResource(id = R.dimen.space_size_16))
+                contentPadding = PaddingValues(LocalDim.current.spaceSize16)
             ) {
 
                 items(state.ratesList, key = { it.id }) { item ->
@@ -158,7 +151,7 @@ fun AllRatesScreen(
 
         Spacer(
             modifier = Modifier
-                .height(dimensionResource(id = R.dimen.space_size_1))
+                .height(LocalDim.current.spaceSize1)
                 .fillMaxWidth()
                 .background(color = Outline)
         )

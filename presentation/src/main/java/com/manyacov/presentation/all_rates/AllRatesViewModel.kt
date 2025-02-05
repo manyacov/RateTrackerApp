@@ -1,5 +1,6 @@
 package com.manyacov.presentation.all_rates
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manyacov.domain.rate_tracker.model.CurrencySymbols
@@ -25,13 +26,13 @@ class AllRatesViewModel @Inject constructor(
 
     fun updateFilterOption(option: SortOptions) {
         _state.update {
-            state.value.copy(filterOption = option)
+            it.copy(filterOption = option)
         }
     }
 
     fun updateSelectedSymbols(symbols: CurrencySymbols) = viewModelScope.launch(Dispatchers.IO) {
         _state.update {
-            state.value.copy(baseSymbols = symbols)
+            it.copy(baseSymbols = symbols)
         }
         getLatestRates(true)
     }
@@ -42,7 +43,7 @@ class AllRatesViewModel @Inject constructor(
                 is CustomResult.Success -> {
                     val base = state.value.baseSymbols
                     _state.update {
-                        state.value.copy(
+                        it.copy(
                             symbols = result.data ?: emptyList(),
                             baseSymbols = base ?: result.data?.get(0),
                             isLoading = false,
@@ -51,10 +52,9 @@ class AllRatesViewModel @Inject constructor(
                     }
                     getLatestRates(base == null)
                 }
+
                 else -> {
-                    _state.update {
-                        state.value.copy(isLoading = false, error = result.issueType)
-                    }
+                    _state.update { it.copy(isLoading = false, error = result.issueType) }
                 }
             }
         }
@@ -65,42 +65,40 @@ class AllRatesViewModel @Inject constructor(
     }
 
     private suspend fun getLatestRates(withSync: Boolean) {
-        _state.update { state.value.copy(isLoading = true) }
+        _state.update { it.copy(isLoading = true) }
         repository.loadLatestRates(
-            state.value.baseSymbols?.symbols ?: "",
-            state.value.filterOption.toString(),
+            state.value.baseSymbols?.symbols.orEmpty(),
             withSync
         ).collect { result ->
             when (result) {
                 is CustomResult.Success -> {
+
+                    val sortedList = when (state.value.filterOption) {
+                        SortOptions.CODE_A_Z -> result.data?.sortedBy { it.symbols }
+                        SortOptions.CODE_Z_A -> result.data?.sortedByDescending { it.symbols }
+                        SortOptions.QUOTE_ASC -> result.data?.sortedBy { it.value }
+                        SortOptions.QUOTE_DESC -> result.data?.sortedByDescending { it.value }
+                    }.apply {
+                        Log.println(Log.DEBUG, "RRRR", "filter")
+                    }
+
                     _state.update {
-                        state.value.copy(
-                            ratesList = result.data ?: emptyList(),
+                        it.copy(
+                            ratesList = sortedList ?: emptyList(),
                             isLoading = false,
                             error = null
                         )
                     }
                 }
+
                 else -> {
-                    _state.update {
-                        state.value.copy(isLoading = false, error = result?.issueType)
-                    }
+                    _state.update { it.copy(isLoading = false, error = result?.issueType) }
                 }
             }
         }
     }
 
     fun selectFavorite(symbols: String) = viewModelScope.launch(Dispatchers.IO) {
-        when (val result =
-            repository.changeFavoriteStatus(state.value.baseSymbols?.symbols ?: "", symbols)) {
-
-            is CustomResult.Success -> {}
-
-            is CustomResult.Error -> {
-                _state.update {
-                    state.value.copy(isLoading = false, error = result.issueType)
-                }
-            }
-        }
+        repository.changeFavoriteStatus(state.value.baseSymbols?.symbols.orEmpty(), symbols)
     }
 }

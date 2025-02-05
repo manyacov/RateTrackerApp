@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +25,10 @@ import com.manyacov.presentation.ui_filter_parts.BlueThemeButton
 import com.manyacov.presentation.ui_filter_parts.SortOption
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.theme.TextSecondary
-import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
 import com.manyacov.ui.R
 import com.manyacov.ui.theme.HeaderBg
+import com.manyacov.ui.theme.LocalDim
+import com.manyacov.ui.theme.LocalTextDim
 
 @Composable
 fun FilterScreen(
@@ -57,18 +57,18 @@ fun FilterScreen(
 ) {
     Column(
         modifier = modifier
-            .padding(bottom = dimensionResource(id = R.dimen.space_size_16)),
+            .padding(bottom = LocalDim.current.spaceSize16),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = HeaderBg)
                 .padding(
-                    horizontal = dimensionResource(id = R.dimen.space_size_16),
-                    vertical = dimensionResource(id = R.dimen.space_size_12)
+                    horizontal = LocalDim.current.spaceSize16,
+                    vertical = LocalDim.current.spaceSize12
                 ),
             horizontalArrangement = Arrangement
-                .spacedBy(dimensionResource(id = R.dimen.space_size_20)),
+                .spacedBy(LocalDim.current.spaceSize20),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -88,22 +88,22 @@ fun FilterScreen(
 
         Text(
             modifier = Modifier.padding(
-                start = dimensionResource(id = R.dimen.space_size_16),
-                top = dimensionResource(id = R.dimen.space_size_16),
-                end = dimensionResource(id = R.dimen.space_size_16),
-                bottom = dimensionResource(id = R.dimen.space_size_14),
+                start = LocalDim.current.spaceSize16,
+                top = LocalDim.current.spaceSize16,
+                end = LocalDim.current.spaceSize16,
+                bottom = LocalDim.current.spaceSize14,
             ),
             text = stringResource(id = R.string.sort_by).uppercase(),
-            fontSize = fontDimensionResource(id = R.dimen.text_size_12),
+            fontSize = LocalTextDim.current.spaceSize12,
             color = TextSecondary
         )
 
         SortOptions.entries.forEach {
-            val title = stringResource(id = it.getDescriptionRes())
+            val title = stringResource(id = it.descriptionRes)
 
             SortOption(
                 modifier = Modifier
-                    .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
+                    .padding(horizontal = LocalDim.current.spaceSize16),
                 text = title,
                 isSelected = filterState.filterOption == it,
                 onClick = { updateFilterOption(it) }
@@ -114,7 +114,7 @@ fun FilterScreen(
 
         BlueThemeButton(
             modifier = Modifier
-                .padding(horizontal = dimensionResource(id = R.dimen.space_size_16)),
+                .padding(horizontal = LocalDim.current.spaceSize16),
             label = stringResource(id = R.string.apply),
             onClick = {
                 navController?.navigateUp()

@@ -1,19 +1,23 @@
 package com.manyacov.ratetrackerapp
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.manyacov.presentation.all_rates.AllRatesScreen
 import com.manyacov.presentation.all_rates.AllRatesViewModel
 import com.manyacov.presentation.favorites.FavoritesScreen
@@ -21,54 +25,67 @@ import com.manyacov.presentation.favorites.FavoritesViewModel
 import com.manyacov.presentation.filter.FilterScreen
 import com.manyacov.ratetrackerapp.navigation.BottomNavigationBar
 import com.manyacov.ratetrackerapp.navigation.NavItem
+import com.manyacov.ratetrackerapp.utils.BOTTOM_NAV_CHANGING_DURATION
+import com.manyacov.ratetrackerapp.utils.SCREEN_CHANGING_DURATION
 import com.manyacov.ui.theme.RateTrackerAppTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(navController: NavHostController) {
+    var bottomBarState by remember { mutableStateOf(true) }
 
-    val bottomBarState = remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntryFlow.collectLatest { backStackEntry ->
+            delay(BOTTOM_NAV_CHANGING_DURATION)
+            bottomBarState = backStackEntry.destination.route != NavItem.Filters.path
+        }
+    }
 
     Scaffold(
         bottomBar = {
-            if (bottomBarState.value) {
+            if (bottomBarState) {
                 BottomNavigationBar(navController)
             }
         }
-    ) { _ ->
+    ) { innerPadding ->
         BackHandler(enabled = navController.currentBackStackEntry != null) {
             navController.navigateUp()
         }
 
         val allRatesViewModel = hiltViewModel<AllRatesViewModel>()
-        val favoritesViewModel = hiltViewModel<FavoritesViewModel>()
 
         NavHost(navController, startDestination = NavItem.Currencies.path) {
             composable(
                 route = NavItem.Currencies.path,
-                enterTransition = { fadeIn(animationSpec = tween(500)) }
+                enterTransition = { fadeIn(animationSpec = tween(SCREEN_CHANGING_DURATION)) }
             ) {
                 AllRatesScreen(
+                    modifier = Modifier.padding(innerPadding),
                     navController = navController,
                     viewModel = allRatesViewModel
                 )
-                bottomBarState.value = true
             }
             composable(
                 route = NavItem.Favorites.path,
-                enterTransition = { fadeIn(animationSpec = tween(500)) })
+                enterTransition = { fadeIn(animationSpec = tween(SCREEN_CHANGING_DURATION)) })
             {
-                FavoritesScreen(viewModel = favoritesViewModel)
-                bottomBarState.value = true
+                val favoritesViewModel = hiltViewModel<FavoritesViewModel>()
+
+                FavoritesScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    viewModel = favoritesViewModel
+                )
             }
-            composable(NavItem.Filters.path,
-                enterTransition = { fadeIn(animationSpec = tween(500)) })
+            composable(
+                route = NavItem.Filters.path,
+                enterTransition = { fadeIn(animationSpec = tween(SCREEN_CHANGING_DURATION)) })
             {
                 FilterScreen(
+                    modifier = Modifier.padding(innerPadding),
                     navController = navController,
                     viewModel = allRatesViewModel
                 )
-                bottomBarState.value = false
             }
         }
     }
@@ -77,9 +94,7 @@ fun MainScreen(navController: NavHostController) {
 @Preview
 @Composable
 fun MainScreenPreview() {
-    val context = LocalContext.current
-
     RateTrackerAppTheme {
-        MainScreen(navController = NavHostController(context = context))
+        MainScreen(navController = rememberNavController())
     }
 }

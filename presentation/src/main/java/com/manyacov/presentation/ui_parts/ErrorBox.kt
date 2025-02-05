@@ -10,12 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
-import com.manyacov.ui.R
+import com.manyacov.ui.theme.LocalDim
+import com.manyacov.ui.theme.LocalTextDim
 
 @Composable
 fun ErrorBox(
@@ -28,13 +27,13 @@ fun ErrorBox(
             .fillMaxSize()
             .clickable { reload() }
             .wrapContentSize(Alignment.Center)
-            .padding(dimensionResource(R.dimen.space_size_16))
+            .padding(LocalDim.current.spaceSize16)
     ) {
         Text(
             text = description,
             color = MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Normal,
-            fontSize = fontDimensionResource(id = R.dimen.text_size_14),
+            fontSize = LocalTextDim.current.spaceSize14,
             textAlign = TextAlign.Center
         )
     }

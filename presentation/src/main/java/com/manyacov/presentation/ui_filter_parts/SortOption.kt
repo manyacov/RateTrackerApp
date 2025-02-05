@@ -11,14 +11,13 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.manyacov.ui.theme.Primary
 import com.manyacov.ui.theme.RateTrackerAppTheme
 import com.manyacov.ui.theme.Secondary
-import com.manyacov.ratetrackerapp.ui.utils.fontDimensionResource
-import com.manyacov.ui.R
+import com.manyacov.ui.theme.LocalDim
+import com.manyacov.ui.theme.LocalTextDim
 
 @Composable
 fun SortOption(
@@ -37,11 +36,11 @@ fun SortOption(
         Text(
             text = text,
             fontWeight = FontWeight(500),
-            fontSize = fontDimensionResource(id = R.dimen.text_size_16)
+            fontSize = LocalTextDim.current.spaceSize16
         )
 
         RadioButton(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.space_size_12)),
+            modifier = Modifier.padding(LocalDim.current.spaceSize12),
             selected = isSelected,
             onClick = onClick,
             colors = RadioButtonDefaults.colors(
