@@ -1,14 +1,11 @@
 package com.manyacov.data.di
 
-import android.content.Context
 import com.manyacov.data.BuildConfig
-import com.manyacov.data.rate_tracker.datasource.local.RateTrackerDatabase
 import com.manyacov.data.rate_tracker.datasource.remote.api.RateTrackerApi
 import com.manyacov.data.rate_tracker.datasource.remote.utils.HeaderInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -54,13 +51,5 @@ object DataModule {
     @Singleton
     fun provideRateTrackerApi(retrofit: Retrofit): RateTrackerApi {
         return retrofit.create(RateTrackerApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideRateTrackerDatabase(
-        @ApplicationContext context: Context
-    ): RateTrackerDatabase {
-        return RateTrackerDatabase(context)
     }
 }
