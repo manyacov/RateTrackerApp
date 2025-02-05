@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.manyacov.ratetrackerapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.manyacov.ratetrackerapp"
